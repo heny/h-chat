@@ -1,0 +1,88 @@
+* {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  box-sizing: border-box;
+}
+.copy {
+  color: #0080ff;
+  cursor: pointer;
+}
+.send-options {
+  display:flex;
+  align-items: center;
+  &__item {
+    margin: 3px 5px 0;
+  }
+}
+.msg-list {
+  width: 300px;
+  height: 300px;
+  border: 1px solid black;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow: auto;
+  margin: 10px;
+  position: relative;
+}
+.msg-list .clears {
+  width: 20px;
+  height: 20px;
+  border: 1px solid black;
+  position: absolute;
+  border-radius: 50px;
+  text-align: center;
+  line-height: 20px;
+  color: #333;
+  right: 5px;
+  top: 5px;
+  font-family: -webkit-pictograph;
+  transition: all .3s;
+}
+.msg-list .clears:hover:after {
+  content: '清空';
+  line-height: 20px;
+  width: 40px;
+  font-size: 14px;
+  height: 20px;
+  border: 1px solid black;
+  position: absolute;
+  top: -2px;
+  left: 0;
+  transform: translateX(-46px);
+  z-index: 1;
+  background-color: transparent;
+  color: #333;
+  border-radius: 4px;
+  transition: all .3s;
+}
+.msg-list li {
+  padding: 3px;
+}
+.ipt-demo {
+  display: flex;
+  flex-direction: column;
+}
+.ipt-demo__span {
+  padding: 5px;
+  padding-left: 10px;
+}
+#msg-ipt {
+  padding-top: 3px;
+  width: 300px;
+  height: 60px;
+  border-radius: 5px;
+  border: 1px solid black;
+  text-indent: 3px;
+  outline: none;
+  font-size: 16px;
+  margin: 10px;
+}
+.send {
+  border: none;
+  padding: 0 10px;
+  height: 30px;
+  border-radius: 5px;
+  margin: 5px;
+  outline: none;
+}
