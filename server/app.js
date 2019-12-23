@@ -12,7 +12,7 @@ io.on('connection', socket => {
   })
 })
 
-var port = process.env.PORT || 3006
+var port = process.env.PORT || 8888
 server.listen(port, _ => {
   console.log('3006端口监听成功')
 })
