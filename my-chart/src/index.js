@@ -1,6 +1,9 @@
 import React from 'react'
 import {render} from 'react-dom'
 import App from './App'
+import config from './config'
 import IO from 'socket.io-client'
-const socket = IO('ws://39.107.82.176:3006')
+
+const path = config.server[config.mode]
+const socket = IO(path)
 render(<App socket={socket} />,window.root)

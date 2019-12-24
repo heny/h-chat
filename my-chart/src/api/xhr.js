@@ -1,6 +1,7 @@
 import axios from 'axios'
+import config from '../config'
 
-axios.defaults.baseURL = 'http://39.107.82.176:3006'
+axios.defaults.baseURL = config.server[config.mode]
 
 axios.interceptors.request.use(
   config => {

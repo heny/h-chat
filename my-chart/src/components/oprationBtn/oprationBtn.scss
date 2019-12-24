@@ -1,0 +1,32 @@
+.send-options {
+  display:flex;
+  align-items: center;
+  &__item {
+    margin: 3px 5px 0;
+  }
+  &__span {
+    padding: 5px 0;
+  }
+  input:checked + label {
+    background-color: red;
+  }
+  label {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid red;
+    display: inline-block;
+    margin: 0px 5px;
+    cursor: pointer;
+    padding: 2px;
+    background-clip: content-box;
+    transition: background-color .2s;
+    margin-right: 50px;
+    span {
+      cursor: pointer;
+      margin-left: 18px;
+      position: relative;
+      top: -5px;
+    }
+  }
+}

@@ -18,3 +18,4 @@ export const addMessage = data =>
  */
 export const clearMessage = () =>
   getData('/delmsg', null, 'post')
+  

@@ -1,16 +1,28 @@
 import React,{useCallback,useEffect,useRef,useState} from 'react'
+import SendOprtions from './components/oprationBtn/oprationBtn'
+import MessageList from './components/messageList/messageList'
+import SendImage from './components/sendImage/sendImage'
 import './App.scss'
 // import {getMessageList, addMessage, clearMessage} from './api/message'
 export default ({socket}) => {
   const [msg, setMsg] = useState('')
   const [list, setList] = useState([])
   const [key, setKey] = useState('enter')
+  const fileIptRef = React.createRef(null)
   const inputEl = useRef(null)
 
   const send = useCallback(_ => {
+    if(!msg) return
     socket.emit('message', msg)
     inputEl.current.value = ''
+    setMsg('')
   }, [msg, socket])
+
+  const imgSend = useCallback(_ => {
+    const { imgUrl } = fileIptRef.current
+    if(!imgUrl.includes('data:image')) return
+    socket.emit('message', imgUrl)
+  }, [fileIptRef, socket])
 
   // const fetchList = React.useCallback(_ => {
   //   getMessageList().then(res => {
@@ -20,16 +32,12 @@ export default ({socket}) => {
   // }, [])
 
   useEffect(() => {
-    // fetchList()
     socket.on('jieshou', message => {
       setList(state => {
         let state2 = JSON.parse(JSON.stringify(state))
         state2.unshift(message)
         return state2
       })
-      // addMessage({message}).then(res => {
-      //   fetchList()
-      // })
     })
   }, [socket])
 
@@ -63,67 +71,15 @@ export default ({socket}) => {
   }, [handleEnter, key, send])
 
   return (
-    <div>
+    <div className='App'>
       <MessageList list={list} setList={setList} />
       <div className='ipt-demo'>
         <SendOprtions setKey={setKey} />
+        <SendImage ref={fileIptRef} />
         <textarea type="text" id='msg-ipt' ref={inputEl} onChange={e => {setMsg(e.target.value)}} onKeyDown={e => handlerSend(e)} />
       </div>
       <button onClick={send} className='send'>发送</button>
+      <button className='send' onClick={imgSend}>发送Img</button>
     </div>
-  )
-}
-
-
-// 消息发送组件
-function SendOprtions (props) {
-  let {setKey} = props
-  return (
-    <div className='send-options'>
-      <span className='ipt-demo__span'>发送消息按键</span>
-      <input type="radio" name="send-options" onChange={() => setKey('enter')} className='send-options__item' defaultChecked id="enter-radio"/>
-      <label htmlFor="enter-radio">enter</label>
-      <input type="radio" name="send-options" onChange={() => setKey('ctrl-enter')} className='send-options__item' id="ctrl_enter-radio"/>
-      <label htmlFor="ctrl_enter-radio" >ctrl+enter</label>
-    </div>
-  )
-}
-
-
-// 消息列表处理
-function MessageList (props) {
-  let {list, setList} = props
-
-  const clearAll = useCallback(_ => {
-    setList([])
-    // clearMessage().then(res => {
-    //   fetchList()
-    // })
-  }, [setList])
-
-  // 复制功能
-  const copys = useCallback((cont,el) => {
-    const textArea = document.createElement('textarea')
-    textArea.value = cont
-    document.body.appendChild(textArea)
-    textArea.select()
-    document.execCommand('copy')    //开启复制;
-    document.body.removeChild(textArea)
-    // 复制成功处理
-    el.innerText = '复制成功'
-    el.style.color = '#000'
-    setTimeout(_ => {
-      el.innerText = "复制"
-      el.style.color = '#0080ff'
-    }, 1500)
-  }, [])
-
-  return (
-    <ul className='msg-list'>
-      {list.map((item,index) => (
-        <li key={index}>{item} <span className='copy' onClick={e => copys(item,e.target)}>复制</span></li>
-      ))}
-      <span className="clears" onClick={clearAll}>X</span>
-    </ul>
   )
 }
