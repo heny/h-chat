@@ -117,6 +117,7 @@ export default ({socket}) => {
           onPaste={pasteHandler}
           type='text'
           id='msg-ipt'
+          placeholder='可在此粘贴图片发送'
           ref={inputEl}
           onChange={e => {setMsg(e.target.value)}}
           onKeyDown={e => handlerSend(e)}
