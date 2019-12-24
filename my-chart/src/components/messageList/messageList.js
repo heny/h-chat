@@ -29,33 +29,38 @@ export default function (props) {
       console.error('Trigger:', e.trigger);
      });
 
-    
     return function(){
       clipboard.destroy()
     }
   }, [])
 
   return (
-    <ul className='msg-list'>
-      {list.map((item,index) => (
-        <li key={index} className='msg-list__item'>
-          { item.includes('data:image')
-            ? (
-              <div className='msg-list__img'>
-                <img src={item} alt=""/>
-              </div>
-            )
-            : (
-            <>
-              <span>{item}</span>
-              <span className='msg-list__copy' data-clipboard-text={item}>复制</span>
-            </>
-            )
-          }
-          
-        </li>
-      ))}
+    <div className='msg-list'>
+      <ul>
+        { list.length ?
+          list.map((item,index) => (
+            <li key={index} className='msg-list__item'>
+              { item.includes('data:image')
+                ? (
+                  <div className='msg-list__img'>
+                    <img src={item} alt=""/>
+                  </div>
+                )
+                : (
+                <>
+                  <span>{item}</span>
+                  <span className='msg-list__copy' data-clipboard-text={item}>复制</span>
+                </>
+                )
+              }
+            </li>
+          ))
+        : <div className='msg-list__empty'>
+            <span>支持拖拽发送</span>
+          </div>
+      }
+      </ul>
       <span className="clears" onClick={clearAll}>X</span>
-    </ul>
+    </div>
   )
 }

@@ -1,4 +1,5 @@
 require('./mongo/connect')
+require('./routes/messageRouter')
 const app = require('express')()
 const server = require('http').createServer(app);
 const io = require('socket.io')(server)
@@ -14,7 +15,7 @@ io.on('connection', socket => {
 
 var port = process.env.PORT || 8888
 server.listen(port, _ => {
-  console.log('3006端口监听成功')
+  console.log('8888端口监听成功')
 })
 
 
@@ -29,24 +30,4 @@ app.use('/', (req,res, next) => {
 })
 app.get('/',(req,res) => {
 	res.send('服务启动成功')
-})
-
-app.get('/msglist', (req,res) => {
-  msgdb.findMessageAll({}, {message: 1, _id: 0}, {sort: {date: -1}}, (err, docs) => {
-    if(err) throw new Error()
-    res.send(docs)
-  })
-})
-
-app.post('/addmsg', (req,res) => {
-  console.log(req.body, '333333333333333333333后台接收')
-  msgdb.addMessage(req.body, err => {
-    res.send('添加成功')
-  })
-})
-
-app.post('/delmsg', (req,res) => {
-  msgdb.updateMessage({}, err => {
-    res.send('删除成功')
-  })
 })

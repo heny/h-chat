@@ -9,7 +9,13 @@
   margin: 10px 0;
   position: relative;
   padding-right: 30px;
-
+  &__empty {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #e6e6e6;
+  }
   .clears {
     width: 20px;
     height: 20px;

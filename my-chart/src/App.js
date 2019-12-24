@@ -11,6 +11,7 @@ export default ({socket}) => {
   const fileIptRef = React.createRef(null)
   const inputEl = useRef(null)
 
+  // 发送消息
   const send = useCallback(_ => {
     if(!msg) return
     socket.emit('message', msg)
@@ -18,6 +19,7 @@ export default ({socket}) => {
     setMsg('')
   }, [msg, socket])
 
+  // 发送图片
   const imgSend = useCallback(_ => {
     const { imgUrl } = fileIptRef.current
     if(!imgUrl.includes('data:image')) return
@@ -31,7 +33,31 @@ export default ({socket}) => {
   //   })
   // }, [])
 
+  // 传入file对象，进行发送消息
+  const byFileSendMessage = useCallback(file => {
+    let fr = new FileReader();
+    fr.readAsDataURL(file)
+    fr.onload = e => {
+      if(!fr.result.includes('data:image')) return
+      socket.emit('message', fr.result)
+    }
+  }, [socket])
+
+  // 拖拽发送图片
+  const dragUpload = useCallback(()=>{
+    // 触发ondrog事件
+    document.ondragover = e => e.preventDefault()
+    document.ondrop = e => e.preventDefault()
+    document.querySelector('.msg-list').ondrop = e => {
+      let {files} = e.dataTransfer
+      files[0] && byFileSendMessage(files[0])
+    }
+  }, [byFileSendMessage])
+
+
   useEffect(() => {
+    dragUpload()
+    // 创建接收事件
     socket.on('jieshou', message => {
       setList(state => {
         let state2 = JSON.parse(JSON.stringify(state))
@@ -39,17 +65,27 @@ export default ({socket}) => {
         return state2
       })
     })
-  }, [socket])
+  }, [socket, dragUpload])
 
 
-  const handleEnter = React.useCallback(e => {
+  const handleEnter = useCallback(e => {
       if(e.keyCode === 13) {
         send()
         inputEl.current.value = ''
       }
   }, [send])
 
-  const handlerSend = React.useCallback((e) => {
+
+  // 粘贴发送消息
+  const pasteHandler = useCallback(e =>{
+    e.persist()
+    let {files} = e.clipboardData
+    files[0] && byFileSendMessage(files[0])
+  }, [byFileSendMessage])
+
+
+  // 判断发送事件
+  const handlerSend = useCallback(e => {
     if(key === 'enter'){
       if(e.keyCode === 13) {
         // 阻止默认的回车按钮
@@ -70,13 +106,21 @@ export default ({socket}) => {
     }
   }, [handleEnter, key, send])
 
+
   return (
     <div className='App'>
       <MessageList list={list} setList={setList} />
       <div className='ipt-demo'>
         <SendOprtions setKey={setKey} />
         <SendImage ref={fileIptRef} />
-        <textarea type="text" id='msg-ipt' ref={inputEl} onChange={e => {setMsg(e.target.value)}} onKeyDown={e => handlerSend(e)} />
+        <textarea
+          onPaste={pasteHandler}
+          type='text'
+          id='msg-ipt'
+          ref={inputEl}
+          onChange={e => {setMsg(e.target.value)}}
+          onKeyDown={e => handlerSend(e)}
+        />
       </div>
       <button onClick={send} className='send'>发送</button>
       <button className='send' onClick={imgSend}>发送Img</button>
