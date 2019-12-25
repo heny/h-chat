@@ -1,7 +1,7 @@
 import axios from 'axios'
 import config from '../config'
 
-axios.defaults.baseURL = config.server[config.mode]
+axios.defaults.baseURL = config.getCurrentServer()
 
 axios.interceptors.request.use(
   config => {

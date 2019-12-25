@@ -12,6 +12,11 @@ export default React.forwardRef((props, ref) => {
     if(files[0] && files[0].type.includes('image')){
       let fr = new FileReader()
       fr.readAsDataURL(files[0])
+      fr.onprogress = e => {
+        if(!e.lengthComputable) return
+        let percent = Math.round((e.loaded / e.total) * 100)
+        console.log(`${files[0].name},progress is ${percent}%`)
+      }
       fr.onload = ()=>{
         setImgUrl(fr.result)
       }

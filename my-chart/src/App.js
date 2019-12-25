@@ -8,8 +8,9 @@ export default ({socket}) => {
   const [msg, setMsg] = useState('')
   const [list, setList] = useState([])
   const [key, setKey] = useState('enter')
-  const fileIptRef = React.createRef(null)
-  const inputEl = useRef(null)
+  const fileIptRef = React.createRef(null) // 获取子组件方法
+  const inputEl = useRef(null) // 绑定输入框el
+  const sendImgEl = useRef(null) // 获取发送img的元素
 
   // 发送消息
   const send = useCallback(_ => {
@@ -23,6 +24,13 @@ export default ({socket}) => {
   const imgSend = useCallback(_ => {
     const { imgUrl } = fileIptRef.current
     if(!imgUrl.includes('data:image')) return
+    let el = sendImgEl.current
+    el.innerHTML = '发送成功,请等待'
+    el.style.color = 'red'
+    setTimeout(()=>{
+      el.innerHTML = '发送IMG'
+      el.style.color = '#000'
+    },1500)
     socket.emit('message', imgUrl)
   }, [fileIptRef, socket])
 
@@ -124,7 +132,7 @@ export default ({socket}) => {
         />
       </div>
       <button onClick={send} className='send'>发送</button>
-      <button className='send' onClick={imgSend}>发送Img</button>
+      <button className='send' onClick={imgSend} ref={sendImgEl} >发送Img</button>
     </div>
   )
 }
