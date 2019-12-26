@@ -1,4 +1,5 @@
 import React from 'react'
+import './sendImage.scss'
 
 export default React.forwardRef((props, ref) => {
   const [imgUrl, setImgUrl] = React.useState('')
@@ -26,6 +27,9 @@ export default React.forwardRef((props, ref) => {
   return (
     <div className='send-img'>
       <input onChange={changeHandler} type="file" />
+      <img className='send-img__preview' src={imgUrl} style={{
+        border: imgUrl && '1px solid #e0dada'
+      }} alt='' />
     </div>
   )
 })

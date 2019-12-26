@@ -34,6 +34,19 @@ export default function (props) {
     }
   }, [])
 
+  // 点击打开图片
+  const openImg = useCallback(src=>{
+    const empty = document.createElement('div')
+    const imgEl = document.createElement("img")
+    imgEl.src = src
+    imgEl.style.maxWidth = document.documentElement.clientWidth + 'px'
+    imgEl.style.maxHeight = document.documentElement.clientHeight + 'px'
+    empty.appendChild(imgEl)
+    empty.className = 'msg-list__shade'
+    document.body.appendChild(empty)
+    empty.addEventListener('click',()=>{empty.remove()})
+  }, [])
+
   return (
     <div className='msg-list'>
       <ul>
@@ -43,7 +56,7 @@ export default function (props) {
               { item.includes('data:image')
                 ? (
                   <div className='msg-list__img'>
-                    <img src={item} alt=""/>
+                    <img src={item} alt="" onClick={()=>openImg(item)}/>
                   </div>
                 )
                 : (

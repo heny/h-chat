@@ -1,2 +1,12 @@
 .send-img {
+  width: 300px;
+  display: flex;
+  &__preview {
+    display: block;
+    margin-left: auto;
+    width: 23px;
+    height: 23px;
+    border: none;
+    object-fit: cover;
+  }
 }
