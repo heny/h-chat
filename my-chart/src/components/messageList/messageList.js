@@ -40,9 +40,12 @@ export default function (props) {
     const imgEl = document.createElement("img")
     imgEl.src = src
     imgEl.style.maxWidth = document.documentElement.clientWidth + 'px'
-    imgEl.style.maxHeight = document.documentElement.clientHeight + 'px'
     empty.appendChild(imgEl)
     empty.className = 'msg-list__shade'
+    // 当图片过高时，不能使用flex布局上下居中了
+    if(imgEl.height > document.documentElement.clientHeight) {
+      empty.style.display = 'block'
+    }
     document.body.appendChild(empty)
     empty.addEventListener('click',()=>{empty.remove()})
   }, [])
