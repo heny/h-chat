@@ -1,11 +1,14 @@
 import React, {useCallback, } from 'react'
 import Clipboard from 'clipboard'
 import './messageList.scss'
+import {clearMessage} from '../../api/message'
+
 
 export default function (props) {
   let {list, setList} = props
 
   const clearAll = useCallback(_ => {
+    clearMessage()
     setList([])
   }, [setList])
   
