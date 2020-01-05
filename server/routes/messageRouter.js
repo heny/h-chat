@@ -61,7 +61,7 @@ router.post('/upload', (req, res) => {
       }
 
       msgdb.addMessage({ message: base64, fileName: `${fullname}<i class='file-size'>${fileSize}<i>`, filePath: `http://${url}/file/${fullname}` }, err => {
-        res.send('添加成功')
+        res.send({ message: base64, fileName: `${fullname}<i class='file-size'>${fileSize}<i>`, filePath: `http://${url}/file/${fullname}` })
       })
     })
   })
