@@ -7,6 +7,8 @@ import { getMessageList, addMessage, uploadFile } from './api/message'
 export default ({ socket }) => {
   const [msg, setMsg] = useState('')
   const [list, setList] = useState([])
+  const [isSelectFile, setIsSelectFile] = useState(true) // 是否可以选择文件
+  const [isSendAble, setIsSendAble] = useState(false) // 是否可以发送
   const [isUploadServer] = useState(true) // 是否保存到数据库
   const [key, setKey] = useState('enter')
   const fileIptRef = createRef(null) // 获取子组件方法
@@ -15,7 +17,7 @@ export default ({ socket }) => {
 
   // 发送消息函数
   const sendMessage = useCallback((message, size) => {
-    socket.emit('message', message)
+    socket.emit('message', { message })
     // 判断是否需要保存数据库, 转换的base64超过100k将无法存入数据库
     if (isUploadServer && (!size || size < 1024 * 100)) {
       console.log(message, 'message')
@@ -44,20 +46,21 @@ export default ({ socket }) => {
     formData.append('file', file)
     let res = await uploadFile(formData)
     if (res) {
-      fetchList()
-      console.log(res, '3333')
+      setIsSelectFile(false)
+      socket.emit('message', res)
     }
-  }, [fetchList])
+  }, [socket])
 
   // 发送图片
   const imgSendHandler = useCallback(_ => {
-    const { file } = fileIptRef.current
+    const { file, inputFileEl, setFile, setImgUrl } = fileIptRef.current
+    inputFileEl.value = ''
+    setFile(null)
+    setIsSendAble(false)
+    setImgUrl('')
+
     // 处理图片发送
     if (!file) return
-
-    // if (file.type.includes('image')) {
-    //   sendMessage(imgUrl)
-    // }
     // 处理文件上传
     upload(file)
 
@@ -66,23 +69,10 @@ export default ({ socket }) => {
     el.innerHTML = '发送成功,请等待'
     el.style.color = 'red'
     setTimeout(() => {
-      el.innerHTML = '发送IMG'
-      el.style.color = '#000'
+      el.innerHTML = '发送文件'
+      el.style = ''
     }, 1500)
   }, [fileIptRef, upload])
-
-  // 公共方法传入file对象，进行发送消息
-  const byFileSendMessage = useCallback(file => {
-    console.log('file对象', file)
-    upload(file)
-    // if (file.type.includes('image')) {
-    //   let fr = new FileReader();
-    //   fr.readAsDataURL(file)
-    //   fr.onload = e => {
-    //     sendMessage(fr.result, file.size)
-    //   }
-    // }
-  }, [upload])
 
   // 拖拽发送图片
   const dragUpload = useCallback(() => {
@@ -91,9 +81,9 @@ export default ({ socket }) => {
     document.ondrop = e => e.preventDefault()
     document.querySelector('.msg-list').ondrop = e => {
       let { files: [file] } = e.dataTransfer
-      file && byFileSendMessage(file)
+      file && upload(file)
     }
-  }, [byFileSendMessage])
+  }, [upload])
 
 
   useEffect(() => {
@@ -101,10 +91,10 @@ export default ({ socket }) => {
     fetchList()
     // 创建接收事件
     socket.on('jieshou', message => {
-      console.log(message, '3333')
       setList(state => {
         let state2 = JSON.parse(JSON.stringify(state))
-        state2.unshift({ message })
+        state2.unshift(message)
+        setIsSelectFile(true)
         return state2
       })
     })
@@ -145,9 +135,9 @@ export default ({ socket }) => {
   // 粘贴发送消息
   const pasteHandler = useCallback(e => {
     e.persist()
-    let { files } = e.clipboardData
-    files[0] && byFileSendMessage(files[0])
-  }, [byFileSendMessage])
+    let { files: [file] } = e.clipboardData
+    file && upload(file)
+  }, [upload])
 
 
   return (
@@ -155,7 +145,10 @@ export default ({ socket }) => {
       <MessageList list={list} setList={setList} />
       <div className='ipt-demo'>
         <SendOprtions setKey={setKey} />
-        <SendImage ref={fileIptRef} />
+        <SendImage
+          ref={fileIptRef}
+          setIsSendAble={setIsSendAble}
+          isSelectFile={isSelectFile} />
         <textarea
           onPaste={pasteHandler}
           type='text'
@@ -167,7 +160,7 @@ export default ({ socket }) => {
         />
       </div>
       <button onClick={send} className='send'>发送</button>
-      <button className='send' onClick={imgSendHandler} ref={sendImgEl} >发送文件</button>
+      <button className='send' onClick={imgSendHandler} disabled={!isSendAble} ref={sendImgEl} >发送文件</button>
     </div>
   )
 }

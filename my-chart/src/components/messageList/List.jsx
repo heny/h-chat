@@ -1,8 +1,9 @@
 import React, { useEffect, useCallback } from 'react'
 import Clipboard from 'clipboard'
 export default ({ item, ...rest }) => {
+
   // 点击打开图片
-  const openImg = useCallback(src => {
+  const openImg = useCallback(async (message, src) => {
     const empty = document.createElement('div')
     const imgEl = document.createElement("img")
     const btn = document.createElement('button')
@@ -13,14 +14,15 @@ export default ({ item, ...rest }) => {
       window.location.href = src
     })
 
-    imgEl.src = src
+    imgEl.src = message
     imgEl.style.maxWidth = document.documentElement.clientWidth + 'px'
 
     empty.appendChild(imgEl)
     empty.appendChild(btn)
     empty.className = 'msg-list__shade'
     // 当图片过高时，不能使用flex布局上下居中了
-    if (imgEl.height > document.documentElement.clientHeight) {
+    // 使用div块元素来判断, 图片的高度会判断失误, 
+    if (empty.height > document.documentElement.clientHeight) {
       empty.style.display = 'block'
     }
     document.body.appendChild(empty)
@@ -53,15 +55,10 @@ export default ({ item, ...rest }) => {
   }, [])
   let el
   let { message, fileName, filePath } = item
-  if (fileName && (
-    fileName.includes('jpg')
-    || fileName.includes('png')
-    || fileName.includes('jpeg')
-    || fileName.includes('gif')
-  )) {
+  if (fileName && fileName.match(/png|jpg|gif|jpeg/)) {
     el = (
       <div className='msg-list__img'>
-        <img src={filePath} alt="" onClick={() => openImg(filePath)} />
+        <img src={message} alt="" onClick={() => openImg(message, filePath)} />
       </div>
     )
   } else if (fileName) {

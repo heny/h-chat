@@ -1,18 +1,24 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import './sendImage.scss'
 
-export default React.forwardRef((props, ref) => {
+export default React.forwardRef(({ setIsSendAble, isSelectFile }, ref) => {
   const [imgUrl, setImgUrl] = useState('')
   const [file, setFile] = useState(null)
+  const inputFileEl = useRef(null)
 
   React.useImperativeHandle(ref, state => ({
-    file
+    file, inputFileEl: inputFileEl.current, setFile, setImgUrl
   }), [file])
 
   // 选择文件上传
   const changeHandler = e => {
     const { files: [file] } = e.target
+    setIsSendAble(false)
+    setImgUrl('') // 在选择文件时, 如果点击取消, 则清空
+    setFile(null)
+
     if (!file) return // 如果没有file则不往下执行
+    setIsSendAble(true)
     setFile(file)
     // 如果是图片, 则将图片转换为base64进行预览
     if (file.type.includes('image')) {
@@ -32,7 +38,7 @@ export default React.forwardRef((props, ref) => {
 
   return (
     <div className='send-img'>
-      <input onChange={changeHandler} type="file" />
+      <input onChange={changeHandler} disabled={!isSelectFile} ref={inputFileEl} type="file" />
       <img className='send-img__preview' src={imgUrl} style={{
         border: imgUrl ? '1px solid #e0dada' : 'none'
       }} alt='' />
