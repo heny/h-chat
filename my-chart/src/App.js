@@ -1,37 +1,67 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { createRef, useCallback, useEffect, useRef, useState } from 'react'
 import SendOprtions from './components/oprationBtn/oprationBtn'
 import MessageList from './components/messageList/messageList'
 import SendImage from './components/sendImage/sendImage'
 import './App.scss'
-import { getMessageList, addMessage } from './api/message'
+import { getMessageList, addMessage, uploadFile } from './api/message'
 export default ({ socket }) => {
   const [msg, setMsg] = useState('')
   const [list, setList] = useState([])
   const [isUploadServer] = useState(true) // 是否保存到数据库
   const [key, setKey] = useState('enter')
-  const fileIptRef = React.createRef(null) // 获取子组件方法
+  const fileIptRef = createRef(null) // 获取子组件方法
   const inputEl = useRef(null) // 绑定输入框el
   const sendImgEl = useRef(null) // 获取发送img的元素
 
-  // 上传到服务器
-  const uploadServer = useCallback(message => {
-    isUploadServer && addMessage({ message })
-  }, [isUploadServer])
+  // 发送消息函数
+  const sendMessage = useCallback((message, size) => {
+    socket.emit('message', message)
+    // 判断是否需要保存数据库, 转换的base64超过100k将无法存入数据库
+    if (isUploadServer && (!size || size < 1024 * 100)) {
+      console.log(message, 'message')
+      addMessage({ message })
+    }
+  }, [isUploadServer, socket])
 
-  // 发送消息
+  // 请求数据
+  const fetchList = React.useCallback(async _ => {
+    let res = await getMessageList()
+    // 将请求到的数据放进list里面
+    res && setList(res)
+  }, [])
+
+  // enter发送消息
   const send = useCallback(async _ => {
     if (!msg) return
-    socket.emit('message', msg)
-    // 在发送消息的时候储存
-    uploadServer(msg)
-    inputEl.current.value = ''
+    sendMessage(msg)
     setMsg('')
-  }, [msg, socket, uploadServer])
+    inputEl.current.value = ''
+  }, [msg, sendMessage])
+
+  // 处理文件上传
+  const upload = useCallback(async file => {
+    let formData = new FormData()
+    formData.append('file', file)
+    let res = await uploadFile(formData)
+    if (res) {
+      fetchList()
+      console.log(res, '3333')
+    }
+  }, [fetchList])
 
   // 发送图片
-  const imgSend = useCallback(_ => {
-    const { imgUrl } = fileIptRef.current
-    if (!imgUrl.includes('data:image')) return
+  const imgSendHandler = useCallback(_ => {
+    const { file } = fileIptRef.current
+    // 处理图片发送
+    if (!file) return
+
+    // if (file.type.includes('image')) {
+    //   sendMessage(imgUrl)
+    // }
+    // 处理文件上传
+    upload(file)
+
+    // 修改按键
     let el = sendImgEl.current
     el.innerHTML = '发送成功,请等待'
     el.style.color = 'red'
@@ -39,29 +69,20 @@ export default ({ socket }) => {
       el.innerHTML = '发送IMG'
       el.style.color = '#000'
     }, 1500)
-    socket.emit('message', imgUrl)
-    uploadServer(imgUrl)
-  }, [fileIptRef, socket, uploadServer])
-
-  // 请求数据
-  const fetchList = React.useCallback(async _ => {
-    let res = await getMessageList()
-    if (res) {
-      // 将请求到的数据放进list里面
-      setList(Array.from(res, ({ message }) => message))
-    }
-  }, [])
+  }, [fileIptRef, upload])
 
   // 公共方法传入file对象，进行发送消息
   const byFileSendMessage = useCallback(file => {
-    let fr = new FileReader();
-    fr.readAsDataURL(file)
-    fr.onload = e => {
-      if (!fr.result.includes('data:image')) return
-      uploadServer(fr.result)
-      socket.emit('message', fr.result)
-    }
-  }, [socket, uploadServer])
+    console.log('file对象', file)
+    upload(file)
+    // if (file.type.includes('image')) {
+    //   let fr = new FileReader();
+    //   fr.readAsDataURL(file)
+    //   fr.onload = e => {
+    //     sendMessage(fr.result, file.size)
+    //   }
+    // }
+  }, [upload])
 
   // 拖拽发送图片
   const dragUpload = useCallback(() => {
@@ -69,8 +90,8 @@ export default ({ socket }) => {
     document.ondragover = e => e.preventDefault()
     document.ondrop = e => e.preventDefault()
     document.querySelector('.msg-list').ondrop = e => {
-      let { files } = e.dataTransfer
-      files[0] && byFileSendMessage(files[0])
+      let { files: [file] } = e.dataTransfer
+      file && byFileSendMessage(file)
     }
   }, [byFileSendMessage])
 
@@ -80,9 +101,10 @@ export default ({ socket }) => {
     fetchList()
     // 创建接收事件
     socket.on('jieshou', message => {
+      console.log(message, '3333')
       setList(state => {
         let state2 = JSON.parse(JSON.stringify(state))
-        state2.unshift(message)
+        state2.unshift({ message })
         return state2
       })
     })
@@ -95,15 +117,6 @@ export default ({ socket }) => {
       inputEl.current.value = ''
     }
   }, [send])
-
-
-  // 粘贴发送消息
-  const pasteHandler = useCallback(e => {
-    e.persist()
-    let { files } = e.clipboardData
-    files[0] && byFileSendMessage(files[0])
-  }, [byFileSendMessage])
-
 
   // 判断发送事件
   const handlerSend = useCallback(e => {
@@ -128,6 +141,15 @@ export default ({ socket }) => {
   }, [handleEnter, key, send])
 
 
+
+  // 粘贴发送消息
+  const pasteHandler = useCallback(e => {
+    e.persist()
+    let { files } = e.clipboardData
+    files[0] && byFileSendMessage(files[0])
+  }, [byFileSendMessage])
+
+
   return (
     <div className='App'>
       <MessageList list={list} setList={setList} />
@@ -145,7 +167,7 @@ export default ({ socket }) => {
         />
       </div>
       <button onClick={send} className='send'>发送</button>
-      <button className='send' onClick={imgSend} ref={sendImgEl} >发送Img</button>
+      <button className='send' onClick={imgSendHandler} ref={sendImgEl} >发送文件</button>
     </div>
   )
 }

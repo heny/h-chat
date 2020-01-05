@@ -16,13 +16,16 @@ axios.interceptors.response.use(
   error => Promise.reject(error)
 )
 
-export const getData = (url,data,method='get') => {
+export const getData = (url, data, method = 'get', ContentType = 'application/json') => {
   let config = {
     url,
     data,
-    method: method.toLowerCase()
+    method: method.toLowerCase(),
+    headers: {
+      'Content-Type': ContentType
+    },
   }
-  if(method.toLowerCase() === 'get') {
+  if (method.toLowerCase() === 'get') {
     config.params = data
   }
   return axios(config)

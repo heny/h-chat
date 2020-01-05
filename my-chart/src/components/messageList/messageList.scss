@@ -59,6 +59,22 @@
     margin-left: 5px;
     cursor: pointer;
   }
+  &__down {
+    @extend .msg-list__copy;
+    text-decoration: none;
+  }
+  &__godown {
+    position: fixed;
+    top: 20px;
+    padding: 8px;
+    right: 20px;
+    outline: none;
+    border: 1px solid transparent;
+    color: #fff;
+    background: #50504d;
+    border-radius: 5px;
+    letter-spacing: 2px;
+  }
 
   &__img {
     img {
@@ -85,4 +101,10 @@
   li {
     padding: 3px;
   }
+}
+.file-size {
+  font-style: normal;
+  margin-left: 5px;
+  color: #aeafa6;
+  font-size: 14px;
 }
