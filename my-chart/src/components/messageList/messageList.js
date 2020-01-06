@@ -4,7 +4,7 @@ import './messageList.scss'
 import { clearMessage, clearFile } from '../../api/message'
 
 export default function (props) {
-  let { list, setList, showLoading } = props
+  let { list, setList, showLoading, info, setShowLoading } = props
 
   const clearAll = useCallback(_ => {
     clearMessage() // 清空数据库
@@ -29,7 +29,7 @@ export default function (props) {
       </ul>
       <span className="clears" onClick={clearAll}>X</span>
       {showLoading && (
-        <div className='loading'>loading...</div>
+        <div className='loading' onClick={() => setShowLoading(false)}>{info}</div>
       )}
     </div>
   )

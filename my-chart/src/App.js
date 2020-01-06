@@ -15,6 +15,7 @@ export default ({ socket }) => {
   const inputEl = useRef(null) // 绑定输入框el
   const sendImgEl = useRef(null) // 获取发送img的元素
   const [showLoading, setShowLoading] = useState(false) // 是否显示loading
+  const [info, setInfo] = useState('loading...') // 设置显示消息
 
   // 发送消息函数
   const sendMessage = useCallback((message, size) => {
@@ -37,8 +38,14 @@ export default ({ socket }) => {
     // 请求接口, 重新存缓存
     let res = await getMessageList()
     // 将请求到的数据放进list里面
-    if(res) {
-      setShowLoading(false)
+    if (res) {
+      if (res.length) {
+        setShowLoading(false)
+      } else {
+        setTimeout(() => {
+          setShowLoading(false)
+        }, 1500)
+      }
       setList(res)
       // localStorage['list'] = JSON.stringify(res)
     }
@@ -57,9 +64,12 @@ export default ({ socket }) => {
     let formData = new FormData()
     formData.append('file', file)
     let res = await uploadFile(formData)
+    if (file.size > 1024 * 1024) {
+      setShowLoading(true)
+      setInfo('上传成功,正在推送消息...')
+    }
     if (res) {
       setIsSelectFile(false)
-      setShowLoading(true)
       socket.emit('message', res)
     }
   }, [socket])
@@ -67,11 +77,16 @@ export default ({ socket }) => {
   // 发送图片
   const imgSendHandler = useCallback(_ => {
     const { file, inputFileEl, setFile, setImgUrl } = fileIptRef.current
-    setShowLoading(true) // 设置showLoading
-    inputFileEl.value = ''
-    setFile(null)
-    setIsSendAble(false)
-    setImgUrl('')
+    // 如果文件超过1m, 则提示
+    if (file.size > 1024 * 1024) {
+      setShowLoading(true) // 设置showLoading
+      setInfo('正在上传中, 请等待...')
+    }
+    inputFileEl.value = '' // 清空文件选择框
+    setFile(null) // 清空文件
+    setIsSelectFile(false) // 设置是否可以选择图片
+    setIsSendAble(false) // 设置是否可以发送图片的
+    setImgUrl('') // 清空图片信息
 
     // 处理图片发送
     if (!file) return
@@ -79,13 +94,13 @@ export default ({ socket }) => {
     upload(file)
 
     // 修改按键
-    let el = sendImgEl.current
-    el.innerHTML = '发送成功,请等待'
-    el.style.color = 'red'
-    setTimeout(() => {
-      el.innerHTML = '发送文件'
-      el.style = ''
-    }, 1500)
+    // let el = sendImgEl.current
+    // el.innerHTML = '发送成功,请等待'
+    // el.style.color = 'red'
+    // setTimeout(() => {
+    //   el.innerHTML = '发送文件'
+    //   el.style = ''
+    // }, 1500)
   }, [fileIptRef, upload])
 
   // 拖拽发送图片
@@ -105,6 +120,7 @@ export default ({ socket }) => {
     fetchList()
     // 创建接收事件
     socket.on('jieshou', message => {
+      setInfo('接收成功')
       setShowLoading(false)
       setList(state => {
         let state2 = JSON.parse(JSON.stringify(state))
@@ -158,7 +174,12 @@ export default ({ socket }) => {
 
   return (
     <div className='App'>
-      <MessageList list={list} setList={setList} showLoading={showLoading} />
+      <MessageList
+        list={list}
+        setList={setList}
+        showLoading={showLoading}
+        setShowLoading={setShowLoading}
+        info={info} />
       <div className='ipt-demo'>
         <SendOprtions setKey={setKey} />
         <SendImage

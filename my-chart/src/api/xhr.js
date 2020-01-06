@@ -11,6 +11,9 @@ axios.interceptors.request.use(
 )
 axios.interceptors.response.use(
   response => {
+    if (response.data.code && response.data.code === 500) {
+      return Promise.reject()
+    }
     return response.data
   },
   error => Promise.reject(error)

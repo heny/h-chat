@@ -8,7 +8,9 @@ const mineType = require('mime-types')
 
 router.get('/list', (req, res) => {
   msgdb.findMessageAll({}, { message: 1, fileName: 1, filePath: 1, _id: 0 }, { sort: { date: -1 } }, (err, docs) => {
-    if (err) throw new Error()
+    if (err) {
+      return res.send({ code: 500, message: '数据查询出错' })
+    }
     res.send(docs)
   })
 })

@@ -30,7 +30,7 @@ io.on('connection', socket => {
 // 开放uploads文件夹提供下载文件
 app.use('/file', express.static('uploads'))
 
-var port = process.env.PORT || 8888
+var port = process.env.PORT || 8886
 server.listen(port, _ => {
   debug('8888端口监听成功')
 })
