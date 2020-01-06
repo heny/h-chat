@@ -29,7 +29,9 @@ export default function (props) {
       </ul>
       <span className="clears" onClick={clearAll}>X</span>
       {showLoading && (
-        <div className='loading' onClick={() => setShowLoading(false)}>{info}</div>
+        <div className='loading' onClick={() => setShowLoading(false)}>
+          <span className='dot'></span>{info}
+        </div>
       )}
     </div>
   )

@@ -67,6 +67,9 @@ export default ({ socket }) => {
     if (file.size > 1024 * 1024) {
       setShowLoading(true)
       setInfo('上传成功,正在推送消息...')
+      setTimeout(() => {
+        setInfo('文件过大, 请耐心等待...')
+      }, 2000)
     }
     if (res) {
       setIsSelectFile(false)
