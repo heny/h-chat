@@ -69,7 +69,7 @@ export default ({ socket }) => {
     el.innerHTML = '发送成功,请等待'
     el.style.color = 'red'
     setTimeout(() => {
-      el.innerHTML = '发送文件'
+      el.innerHTML = '发送'
       el.style = ''
     }, 1500)
   }, [fileIptRef, upload])
