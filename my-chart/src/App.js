@@ -14,6 +14,7 @@ export default ({ socket }) => {
   const fileIptRef = createRef(null) // 获取子组件方法
   const inputEl = useRef(null) // 绑定输入框el
   const sendImgEl = useRef(null) // 获取发送img的元素
+  const [showLoading, setShowLoading] = useState(false) // 是否显示loading
 
   // 发送消息函数
   const sendMessage = useCallback((message, size) => {
@@ -27,16 +28,19 @@ export default ({ socket }) => {
 
   // 请求数据
   const fetchList = React.useCallback(async _ => {
-    // 判断缓存是否有
-    if (localStorage['list']) {
-      setList(JSON.parse(localStorage['list']))
-    }
+    // 判断缓存是否有, 即使有也需要存文件
+    setShowLoading(true)
+    // if (localStorage['list']) {
+    //   setShowLoading(false)
+    //   setList(JSON.parse(localStorage['list']))
+    // }
     // 请求接口, 重新存缓存
     let res = await getMessageList()
     // 将请求到的数据放进list里面
     if(res) {
-      localStorage['list'] = JSON.stringify(res)
+      setShowLoading(false)
       setList(res)
+      // localStorage['list'] = JSON.stringify(res)
     }
   }, [])
 
@@ -55,6 +59,7 @@ export default ({ socket }) => {
     let res = await uploadFile(formData)
     if (res) {
       setIsSelectFile(false)
+      setShowLoading(true)
       socket.emit('message', res)
     }
   }, [socket])
@@ -62,6 +67,7 @@ export default ({ socket }) => {
   // 发送图片
   const imgSendHandler = useCallback(_ => {
     const { file, inputFileEl, setFile, setImgUrl } = fileIptRef.current
+    setShowLoading(true) // 设置showLoading
     inputFileEl.value = ''
     setFile(null)
     setIsSendAble(false)
@@ -99,11 +105,12 @@ export default ({ socket }) => {
     fetchList()
     // 创建接收事件
     socket.on('jieshou', message => {
+      setShowLoading(false)
       setList(state => {
         let state2 = JSON.parse(JSON.stringify(state))
         state2.unshift(message)
         setIsSelectFile(true)
-        localStorage['list'] = JSON.stringify(state2)
+        // localStorage['list'] = JSON.stringify(state2)
         return state2
       })
       // 发送消息缓存一份list
@@ -151,7 +158,7 @@ export default ({ socket }) => {
 
   return (
     <div className='App'>
-      <MessageList list={list} setList={setList} />
+      <MessageList list={list} setList={setList} showLoading={showLoading} />
       <div className='ipt-demo'>
         <SendOprtions setKey={setKey} />
         <SendImage

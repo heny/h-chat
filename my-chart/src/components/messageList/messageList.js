@@ -4,13 +4,13 @@ import './messageList.scss'
 import { clearMessage, clearFile } from '../../api/message'
 
 export default function (props) {
-  let { list, setList } = props
+  let { list, setList, showLoading } = props
 
   const clearAll = useCallback(_ => {
     clearMessage() // 清空数据库
     clearFile() // 清空远端文件
     setList([]) // 清空list
-    localStorage.removeItem('list') // 删除localStorage
+    // localStorage.removeItem('list') // 删除localStorage
   }, [setList])
 
   return (
@@ -28,6 +28,9 @@ export default function (props) {
         }
       </ul>
       <span className="clears" onClick={clearAll}>X</span>
+      {showLoading && (
+        <div className='loading'>loading...</div>
+      )}
     </div>
   )
 }
