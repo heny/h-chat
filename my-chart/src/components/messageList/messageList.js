@@ -7,9 +7,10 @@ export default function (props) {
   let { list, setList } = props
 
   const clearAll = useCallback(_ => {
-    clearMessage()
-    clearFile()
-    setList([])
+    clearMessage() // 清空数据库
+    clearFile() // 清空远端文件
+    setList([]) // 清空list
+    localStorage.removeItem('list') // 删除localStorage
   }, [setList])
 
   return (

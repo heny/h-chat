@@ -27,9 +27,17 @@ export default ({ socket }) => {
 
   // 请求数据
   const fetchList = React.useCallback(async _ => {
+    // 判断缓存是否有
+    if (localStorage['list']) {
+      setList(JSON.parse(localStorage['list']))
+    }
+    // 请求接口, 重新存缓存
     let res = await getMessageList()
     // 将请求到的数据放进list里面
-    res && setList(res)
+    if(res) {
+      localStorage['list'] = JSON.stringify(res)
+      setList(res)
+    }
   }, [])
 
   // enter发送消息
@@ -95,11 +103,12 @@ export default ({ socket }) => {
         let state2 = JSON.parse(JSON.stringify(state))
         state2.unshift(message)
         setIsSelectFile(true)
+        localStorage['list'] = JSON.stringify(state2)
         return state2
       })
+      // 发送消息缓存一份list
     })
   }, [socket, dragUpload, fetchList])
-
 
   const handleEnter = useCallback(e => {
     if (e.keyCode === 13) {

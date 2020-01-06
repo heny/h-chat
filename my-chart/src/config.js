@@ -1,5 +1,5 @@
 const config = {
-  mode: 'local',
+  mode: 'origin',
   server: {
     // local: '10.105.19.124:8888', // 公司的ip地址
     local: 'http://192.168.1.110:8868/', // 家里的ip地址
