@@ -4,11 +4,17 @@
   border: 1px solid black;
   white-space: pre-wrap;
   word-break: break-all;
-  overflow: auto;
-  overflow-x: hidden;
   margin: 10px 0;
   position: relative;
-  padding-right: 30px;
+  border-radius: 3px;
+  .msg-list__scroll {
+    height: 100%;
+    overflow: auto;
+    overflow-x: hidden;
+    &::-webkit-scrollbar{
+      display: none
+    }
+  }
   &__empty {
     position: absolute;
     left: 50%;
@@ -19,33 +25,31 @@
   .clears {
     width: 20px;
     height: 20px;
-    border: 1px solid black;
+    border: 1px solid #ccc;
     position: absolute;
     border-radius: 50px;
     text-align: center;
-    // display: flex;
-    // align-items: center;
-    // margin: 0 auto;
     line-height: 20px;
-    color: #333;
+    color: #ccc;
     right: 5px;
     top: 5px;
     // font-family: -webkit-pictograph;
     transition: all .3s;
+    cursor: pointer;
     &:after {
       content: '清空';
       line-height: 20px;
       width: 40px;
       font-size: 14px;
       height: 20px;
-      border: 1px solid black;
+      border: 1px solid #ccc;
       position: absolute;
       top: -2px;
       left: 0;
       opacity: 0;
       z-index: 1;
       background-color: transparent;
-      color: #333;
+      color: #ccc;
       border-radius: 4px;
       transition: all .3s;
     }
@@ -124,6 +128,18 @@
   padding: 5px;
   flex-direction: column;
   justify-content: center;
+}
+.my-loading {
+  margin-bottom: 3px;
+  animation: rotates 1.5s cubic-bezier(0.23, 0.25, 0.55, 0.54) infinite;
+}
+@keyframes rotates{
+  to {
+    transform: rotate(360deg);
+  }
+  from {
+    transform: rotate(0);
+  }
 }
 
 .dot{

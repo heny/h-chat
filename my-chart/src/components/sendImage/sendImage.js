@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from 'react'
 import './sendImage.scss'
 import compressionImg from './compress'
 
-export default React.forwardRef(({ setIsSendAble, isSelectFile }, ref) => {
+export default React.forwardRef(({ setShowLoading, setIsSendAble, isSelectFile, startToast }, ref) => {
   const [imgUrl, setImgUrl] = useState('')
   const [file, setFile] = useState(null)
   const inputFileEl = useRef(null)
@@ -17,10 +17,11 @@ export default React.forwardRef(({ setIsSendAble, isSelectFile }, ref) => {
     setFile(file)
     fr.readAsDataURL(file)
     fr.onload = () => {
+      setShowLoading(false)
       setImgUrl(fr.result)
       setIsSendAble(true)
     }
-  }, [setFile, setIsSendAble])
+  }, [setFile, setIsSendAble, setShowLoading])
 
   // 选择文件上传
   const changeHandler = e => {
@@ -33,8 +34,10 @@ export default React.forwardRef(({ setIsSendAble, isSelectFile }, ref) => {
     // 如果是图片, 则将图片转换为base64进行预览
     if (file.type.includes('image')) {
       // 判断图片是否过大, 太大进行压缩
-      if(file.size > 1024 * 1024) {
-        compressionImg(file, newFile =>setCurFile(newFile))
+      if (file.size > 1024 * 1024) {
+        setShowLoading(true)
+        startToast('图片过大, 正在转换中...')
+        compressionImg(file, newFile => setCurFile(newFile))
       } else {
         setCurFile(file)
       }

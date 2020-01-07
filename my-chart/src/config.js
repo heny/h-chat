@@ -1,8 +1,8 @@
 const config = {
-  mode: 'local',
+  mode: 'home',
   server: {
-    // local: '10.105.19.124:8888', // 公司的ip地址
-    local: 'http://10.105.19.124:8888/', // 家里的ip地址
+    company: 'http://10.105.19.124:8888/', // 公司的ip地址
+    home: 'http://192.168.1.110:8888/', // 家里的ip地址
     origin: 'http://chart-server.heny.vip/' // 服务器的ip地址
   },
   getCurrentServer: function () {

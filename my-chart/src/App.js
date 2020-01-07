@@ -1,9 +1,16 @@
 import React, { createRef, useCallback, useEffect, useRef, useState } from 'react'
+import { useMappedState, useDispatch } from 'redux-react-hook'
 import SendOprtions from './components/oprationBtn/oprationBtn'
 import MessageList from './components/messageList/messageList'
 import SendImage from './components/sendImage/sendImage'
 import './App.scss'
 import { getMessageList, addMessage, uploadFile } from './api/message'
+import {
+  setShowLoading as setshowloading,
+  setInfo as setinfo,
+  setStatus as setstatus
+} from './store/actions'
+
 export default ({ socket }) => {
   const [msg, setMsg] = useState('')
   const [list, setList] = useState([])
@@ -14,8 +21,34 @@ export default ({ socket }) => {
   const fileIptRef = createRef(null) // 获取子组件方法
   const inputEl = useRef(null) // 绑定输入框el
   const sendImgEl = useRef(null) // 获取发送img的元素
-  const [showLoading, setShowLoading] = useState(false) // 是否显示loading
-  const [info, setInfo] = useState('loading...') // 设置显示消息
+  const timerId = useRef(null)
+
+  const mapState = useCallback(state => ({
+    info: state.toast.info,
+    showLoading: state.toast.showLoading
+  }), [])
+  const { showLoading, info } = useMappedState(mapState)
+  const dispatch = useDispatch()
+  const setShowLoading = useCallback((flag) => {
+    setshowloading(flag)(dispatch)
+  }, [dispatch])
+  const setInfo = useCallback(message => {
+    setinfo(message)(dispatch)
+  }, [dispatch])
+  const setStatus = useCallback(status => {
+    setstatus(status)(dispatch)
+  }, [dispatch])
+
+  const startToast = useCallback((info, status = 'loading', isPermanent = true, time = 1500) => {
+    setShowLoading(true)
+    setInfo(info)
+    setStatus(status)
+    if (!isPermanent) {
+      setTimeout(() => {
+        setShowLoading(false)
+      }, time)
+    }
+  }, [setInfo, setStatus, setShowLoading])
 
   // 发送消息函数
   const sendMessage = useCallback((message, size) => {
@@ -30,15 +63,10 @@ export default ({ socket }) => {
   // 请求数据
   const fetchList = React.useCallback(async _ => {
     // 判断缓存是否有, 即使有也需要存文件
-    setShowLoading(true)
-    // if (localStorage['list']) {
-    //   setShowLoading(false)
-    //   setList(JSON.parse(localStorage['list']))
-    // }
+    startToast('Loading...', 'loading')
+    // setShowLoading(true)
     // 请求接口, 重新存缓存
-    let res = await getMessageList()
-    // 将请求到的数据放进list里面
-    if (res) {
+    getMessageList().then(res => {
       if (res.length) {
         setShowLoading(false)
       } else {
@@ -46,10 +74,12 @@ export default ({ socket }) => {
           setShowLoading(false)
         }, 1500)
       }
+      // 将请求到的数据放进list里面
       setList(res)
-      // localStorage['list'] = JSON.stringify(res)
-    }
-  }, [])
+    }).catch(err => {
+      setShowLoading(false)
+    })
+  }, [setShowLoading, startToast])
 
   // enter发送消息
   const send = useCallback(async _ => {
@@ -65,13 +95,14 @@ export default ({ socket }) => {
     formData.append('file', file)
     let res = await uploadFile(formData)
     if (file.size > 1024 * 1024) {
-      setShowLoading(true)
-      setInfo('上传成功,正在推送消息...')
-      setTimeout(() => {
+      startToast('上传成功,正在推送消息...')
+      // setShowLoading(true)
+      // setInfo('上传成功,正在推送消息...')
+      timerId.current = setTimeout(() => {
         setInfo('文件过大, 请耐心等待...')
         setTimeout(() => {
           setInfo('加载超时, 正在重新加载页面...')
-          setTimeout(()=>{
+          setTimeout(() => {
             window.location.reload()
           }, 1500)
         }, 30000)
@@ -81,15 +112,15 @@ export default ({ socket }) => {
       setIsSelectFile(false)
       socket.emit('message', res)
     }
-  }, [socket])
+  }, [socket, startToast, setInfo])
 
   // 发送图片
   const imgSendHandler = useCallback(_ => {
     const { file, inputFileEl, setFile, setImgUrl } = fileIptRef.current
     // 如果文件超过1m, 则提示
     if (file.size > 1024 * 1024) {
-      setShowLoading(true) // 设置showLoading
-      setInfo('正在上传中, 请等待...')
+      // setShowLoading(true) // 设置showLoading
+      startToast('正在上传中, 请等待...')
     }
     inputFileEl.value = '' // 清空文件选择框
     setFile(null) // 清空文件
@@ -110,7 +141,7 @@ export default ({ socket }) => {
     //   el.innerHTML = '发送文件'
     //   el.style = ''
     // }, 1500)
-  }, [fileIptRef, upload])
+  }, [fileIptRef, upload, startToast])
 
   // 拖拽发送图片
   const dragUpload = useCallback(() => {
@@ -129,7 +160,8 @@ export default ({ socket }) => {
     fetchList()
     // 创建接收事件
     socket.on('jieshou', message => {
-      setInfo('接收成功')
+      // 判断是否是定时器在执行
+      timerId.current && clearTimeout(timerId.current)
       setShowLoading(false)
       setList(state => {
         let state2 = JSON.parse(JSON.stringify(state))
@@ -142,7 +174,7 @@ export default ({ socket }) => {
     // socket.on('tupian', message => {
     //   console.log(message, '3333')
     // })
-  }, [socket, dragUpload, fetchList])
+  }, [socket, dragUpload, fetchList, setInfo, setShowLoading])
 
   const handleEnter = useCallback(e => {
     if (e.keyCode === 13) {
@@ -182,21 +214,12 @@ export default ({ socket }) => {
     file && upload(file)
   }, [upload])
 
-
   return (
     <div className='App'>
-      <MessageList
-        list={list}
-        setList={setList}
-        showLoading={showLoading}
-        setShowLoading={setShowLoading}
-        info={info} />
+      <MessageList {...{ list, setList, showLoading, setShowLoading, setStatus, info, startToast }} />
       <div className='ipt-demo'>
         <SendOprtions setKey={setKey} />
-        <SendImage
-          ref={fileIptRef}
-          setIsSendAble={setIsSendAble}
-          isSelectFile={isSelectFile} />
+        <SendImage ref={fileIptRef} {...{ setShowLoading, setIsSendAble, isSelectFile, startToast }} />
         <textarea
           onPaste={pasteHandler}
           type='text'

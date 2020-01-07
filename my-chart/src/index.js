@@ -1,9 +1,16 @@
 import React from 'react'
-import {render} from 'react-dom'
+import { render } from 'react-dom'
 import App from './App'
 import config from './config'
 import IO from 'socket.io-client'
+import { StoreContext } from 'redux-react-hook'
+import store from './store'
 
 const path = config.getCurrentServer()
 const socket = IO(path)
-render(<App socket={socket} />,window.root)
+render(
+  <StoreContext.Provider value={store}>
+    <App socket={socket} />
+  </StoreContext.Provider>
+  , window.root
+)
