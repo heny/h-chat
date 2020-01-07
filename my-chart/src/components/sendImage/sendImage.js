@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 import './sendImage.scss'
+import compressionImg from './compress'
 
 export default React.forwardRef(({ setIsSendAble, isSelectFile }, ref) => {
   const [imgUrl, setImgUrl] = useState('')
@@ -10,6 +11,17 @@ export default React.forwardRef(({ setIsSendAble, isSelectFile }, ref) => {
     file, inputFileEl: inputFileEl.current, setFile, setImgUrl
   }), [file])
 
+  // 设置当前的文件
+  const setCurFile = useCallback(file => {
+    let fr = new FileReader()
+    setFile(file)
+    fr.readAsDataURL(file)
+    fr.onload = () => {
+      setImgUrl(fr.result)
+      setIsSendAble(true)
+    }
+  }, [setFile, setIsSendAble])
+
   // 选择文件上传
   const changeHandler = e => {
     const { files: [file] } = e.target
@@ -18,21 +30,17 @@ export default React.forwardRef(({ setIsSendAble, isSelectFile }, ref) => {
     setFile(null)
 
     if (!file) return // 如果没有file则不往下执行
-    setFile(file)
     // 如果是图片, 则将图片转换为base64进行预览
     if (file.type.includes('image')) {
-      let fr = new FileReader()
-      fr.readAsDataURL(file)
-      // 上传进度
-      // fr.onprogress = e => {
-      //   if (!e.lengthComputable) return
-      //   let percent = Math.round((e.loaded / e.total) * 100)
-      //   console.log(`${file.name},progress is ${percent}%`)
-      // }
-      fr.onload = () => {
-        setImgUrl(fr.result)
-        setIsSendAble(true)
+      // 判断图片是否过大, 太大进行压缩
+      if(file.size > 1024 * 1024) {
+        compressionImg(file, newFile =>setCurFile(newFile))
+      } else {
+        setCurFile(file)
       }
+    } else {
+      setFile(file)
+      setIsSendAble(true)
     }
   }
 

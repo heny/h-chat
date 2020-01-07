@@ -69,7 +69,13 @@ export default ({ socket }) => {
       setInfo('上传成功,正在推送消息...')
       setTimeout(() => {
         setInfo('文件过大, 请耐心等待...')
-      }, 2000)
+        setTimeout(() => {
+          setInfo('加载超时, 正在重新加载页面...')
+          setTimeout(()=>{
+            window.location.reload()
+          }, 1500)
+        }, 30000)
+      }, 3000)
     }
     if (res) {
       setIsSelectFile(false)
@@ -132,8 +138,10 @@ export default ({ socket }) => {
         // localStorage['list'] = JSON.stringify(state2)
         return state2
       })
-      // 发送消息缓存一份list
     })
+    // socket.on('tupian', message => {
+    //   console.log(message, '3333')
+    // })
   }, [socket, dragUpload, fetchList])
 
   const handleEnter = useCallback(e => {
