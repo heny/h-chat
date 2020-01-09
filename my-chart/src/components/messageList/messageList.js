@@ -34,14 +34,14 @@ export default function (props) {
         </ul>
         <span className="clears" onClick={clearAll}>X</span>
         {/* {( */}
-        {showLoading && (
-          <div className={`toast in`}>
+        {/* {showLoading && ( */}
+          <div className={`toast ${showLoading ? 'in' : 'out'}`}>
             {/* {status === 'loading' && <span className='dot'></span>} */}
             {status === 'loading' && <i className='icon-Loading iconfont my-loading'></i>}
             {status === 'success' && <i style={{ fontSize: '25px' }} className='iconfont icon-success'></i>}
             {info}
           </div>
-        )}
+        {/* )} */}
       </div>
     </div>
   )
