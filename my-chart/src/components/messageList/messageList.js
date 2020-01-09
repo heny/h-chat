@@ -7,13 +7,13 @@ import { clearMessage, clearFile } from '../../api/message'
 export default function (props) {
   const mapState = useCallback(state => ({ status: state.toast.status }), [])
   const { status } = useMappedState(mapState)
-  let { list, setList, showLoading, info, setShowLoading, startToast } = props
+  let { list, setList, showLoading, info, startToast } = props
 
   const clearAll = useCallback(_ => {
     clearMessage() // 清空数据库
     clearFile() // 清空远端文件
     setList([]) // 清空list
-    startToast('清空成功...', 'success', false)
+    startToast('清空成功', 'success', false)
     // localStorage.removeItem('list') // 删除localStorage
   }, [setList, startToast])
 
@@ -35,11 +35,10 @@ export default function (props) {
         <span className="clears" onClick={clearAll}>X</span>
         {/* {( */}
         {showLoading && (
-          <div className='loading' onClick={() => setShowLoading(false)}>
+          <div className={`toast in`}>
             {/* {status === 'loading' && <span className='dot'></span>} */}
             {status === 'loading' && <i className='icon-Loading iconfont my-loading'></i>}
             {status === 'success' && <i style={{ fontSize: '25px' }} className='iconfont icon-success'></i>}
-
             {info}
           </div>
         )}
