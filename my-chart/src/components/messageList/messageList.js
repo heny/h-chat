@@ -2,6 +2,7 @@ import React, { useCallback } from 'react'
 import { useMappedState } from 'redux-react-hook'
 import List from './List'
 import './messageList.scss'
+import { CSSTransition } from 'react-transition-group'
 import { clearMessage, clearFile } from '../../api/message'
 
 export default function (props) {
@@ -33,15 +34,22 @@ export default function (props) {
           }
         </ul>
         <span className="clears" onClick={clearAll}>X</span>
-        {/* {( */}
-        {/* {showLoading && ( */}
-          <div className={`toast ${showLoading ? 'in' : 'out'}`}>
-            {/* {status === 'loading' && <span className='dot'></span>} */}
-            {status === 'loading' && <i className='icon-Loading iconfont my-loading'></i>}
-            {status === 'success' && <i style={{ fontSize: '25px' }} className='iconfont icon-success'></i>}
-            {info}
+        <CSSTransition
+          appear={true}
+          unmountOnExit
+          className='fade'
+          timeout={2000}
+          in={showLoading}
+        >
+          <div>
+            <div className='toast'>
+              {/* {status === 'loading' && <span className='dot'></span>} */}
+              {status === 'loading' && <i className='icon-Loading iconfont my-loading'></i>}
+              {status === 'success' && <i style={{ fontSize: '25px' }} className='iconfont icon-success'></i>}
+              {info}
+            </div>
           </div>
-        {/* )} */}
+        </CSSTransition>
       </div>
     </div>
   )

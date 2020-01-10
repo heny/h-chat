@@ -130,10 +130,10 @@
   justify-content: center;
   
 }
-.toast.in {
+.fade.enter {
   animation: fadeIn .6s both;
 }
-.toast.out {
+.fade.exit {
   animation: fadeOut .6s both;
 }
 @keyframes fadeIn {
