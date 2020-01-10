@@ -202,7 +202,7 @@ export default ({ socket }) => {
               onClick={send}
               disabled={!msg}
             >发送</button>
-            <button className='btn-group__item other'>
+            <button onClick={() => setShowOther(true)} className='btn-group__item other'>
               其他
             </button>
           </div>
