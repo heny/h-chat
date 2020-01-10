@@ -3,9 +3,7 @@ const express = require('express')
 const app = express()
 const server = require('http').createServer(app);
 const io = require('socket.io')(server)
-
 const debug = require('debug')('my-application')
-
 
 app.use('/', (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -30,7 +28,7 @@ io.on('connection', socket => {
 // 开放uploads文件夹提供下载文件
 app.use('/file', express.static('uploads'))
 
-var port = process.env.PORT || 8886
+var port = process.env.PORT || 8888
 server.listen(port, _ => {
   debug('8888端口监听成功')
 })

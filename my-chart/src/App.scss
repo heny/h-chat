@@ -4,48 +4,90 @@
   list-style: none;
   box-sizing: border-box;
 }
-
-.App {
-  padding-left: 10px;
-  padding-right: 30px;
+body {
+  background-color: #fff;
+  // padding-bottom: 182px;
+  // padding-top: 40px;
 }
 
-.ipt-demo {
+.footer {
+  // height: 30.7vh;
+  height: 182px;
+  // position: fixed;
+  // bottom: 0;
+  // z-index: 5;
+  border-top: 1px solid #eae4e4;
+  background-color: #fff;
   display: flex;
   flex-direction: column;
 }
-#msg-ipt {
-  padding-top: 5px;
-  width: 300px;
-  height: 60px;
-  border-radius: 5px;
-  border: 1px solid black;
-  text-indent: 12px;
-  outline: none;
-  font-size: 16px;
-  margin: 10px 0;
-  &::placeholder {
-    color: #e6e6e6;
+
+.input-group {
+  height: 21.2vh;
+  // margin-top: 5px;
+  // margin-bottom: 5px;
+  margin: 5px 0;
+  display: flex;
+  align-items: flex-end;
+  .msg-ipt {
+    // width: 70%;
+    flex: 1;
+    height: 140px;
+    border: none;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    padding: 5px;
+    outline: none;
+    font-size: 16px;
+    margin-left: 5px;
+    resize: none;
+    &::placeholder {
+      color: #e6e6e6;
+    }
+  }
+  .btn-group {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    &__item {
+      border: none;
+      padding: 0 15px;
+      height: 30px;
+      border-radius: 20px;
+      outline: none;
+      color: #fff;
+      cursor: pointer;
+      margin: 5px;
+      margin-top: 0;
+      &.send {
+        background-color: #01cafc;
+        &:disabled {
+          background-color: #b3eefe;
+        }
+      }
+    }
   }
 }
-.send {
-  border: none;
-  padding: 0 10px;
-  height: 30px;
-  border-radius: 5px;
-  outline: none;
-  background-color: #ccc;
-  margin-right: 5px;
-  cursor: pointer;
+.shadow-box {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0, .4);
+  .other-options {
+    width: 100%;
+    height: 300px;
+    position: fixed;
+    bottom: 0;
+    border-top: 1px solid #eae4e4;
+    background-color: #fff;
+    &__title {
+      height: 50px;
+      line-height: 50px;
+      border-bottom: 1px solid #eae4e4;
+      text-align: center;
+      margin-bottom: 5px;
+    }
+  }
 }
-// .msg-list>.msg-list__scroll>.loading {
-//   animation: fadeIn 600ms;
-// }
-// @keyframes fadeIn {
-//   from {
-//       opacity: 0;
-//   }
-//   to {
-//       opacity: 1;
-//   }
-// }

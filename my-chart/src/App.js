@@ -3,6 +3,7 @@ import { useMappedState, useDispatch } from 'redux-react-hook'
 import SendOprtions from './components/oprationBtn/oprationBtn'
 import MessageList from './components/messageList/messageList'
 import SendImage from './components/sendImage/sendImage'
+import Header from './components/header/header'
 import './App.scss'
 import { getMessageList, addMessage, uploadFile } from './api/message'
 import {
@@ -14,14 +15,13 @@ import {
 export default ({ socket }) => {
   const [msg, setMsg] = useState('')
   const [list, setList] = useState([])
-  const [isSelectFile, setIsSelectFile] = useState(true) // 是否可以选择文件
-  const [isSendAble, setIsSendAble] = useState(false) // 是否可以发送
   const [isUploadServer] = useState(true) // 是否保存到数据库
   const [key, setKey] = useState('enter')
+  const [showOther, setShowOther] = useState(false) // 显示 更多按钮
   const fileIptRef = createRef(null) // 获取子组件方法
   const inputEl = useRef(null) // 绑定输入框el
-  const sendImgEl = useRef(null) // 获取发送img的元素
   const timerId = useRef(null)
+  const [isSelectFile, setIsSelectFile] = useState(true) // 是否可以选择文件
 
   const mapState = useCallback(state => ({
     info: state.toast.info,
@@ -76,7 +76,7 @@ export default ({ socket }) => {
       }
       // 将请求到的数据放进list里面
       setList(res)
-    }).catch(err => {
+    }).catch(() => {
       setShowLoading(false)
     })
   }, [setShowLoading, startToast])
@@ -112,36 +112,8 @@ export default ({ socket }) => {
       setIsSelectFile(false)
       socket.emit('message', res)
     }
-  }, [socket, startToast, setInfo])
+  }, [socket, startToast, setInfo, setIsSelectFile])
 
-  // 发送图片
-  const imgSendHandler = useCallback(_ => {
-    const { file, inputFileEl, setFile, setImgUrl } = fileIptRef.current
-    // 如果文件超过1m, 则提示
-    if (file.size > 1024 * 1024) {
-      // setShowLoading(true) // 设置showLoading
-      startToast('正在上传中, 请等待...')
-    }
-    inputFileEl.value = '' // 清空文件选择框
-    setFile(null) // 清空文件
-    setIsSelectFile(false) // 设置是否可以选择图片
-    setIsSendAble(false) // 设置是否可以发送图片的
-    setImgUrl('') // 清空图片信息
-
-    // 处理图片发送
-    if (!file) return
-    // 处理文件上传
-    upload(file)
-
-    // 修改按键
-    // let el = sendImgEl.current
-    // el.innerHTML = '发送成功,请等待'
-    // el.style.color = 'red'
-    // setTimeout(() => {
-    //   el.innerHTML = '发送文件'
-    //   el.style = ''
-    // }, 1500)
-  }, [fileIptRef, upload, startToast])
 
   // 拖拽发送图片
   const dragUpload = useCallback(() => {
@@ -167,14 +139,10 @@ export default ({ socket }) => {
         let state2 = JSON.parse(JSON.stringify(state))
         state2.unshift(message)
         setIsSelectFile(true)
-        // localStorage['list'] = JSON.stringify(state2)
         return state2
       })
     })
-    // socket.on('tupian', message => {
-    //   console.log(message, '3333')
-    // })
-  }, [socket, dragUpload, fetchList, setInfo, setShowLoading])
+  }, [fetchList, setIsSelectFile, setShowLoading, dragUpload, socket])
 
   const handleEnter = useCallback(e => {
     if (e.keyCode === 13) {
@@ -205,10 +173,9 @@ export default ({ socket }) => {
     }
   }, [handleEnter, key, send])
 
-
-
   // 粘贴发送消息
   const pasteHandler = useCallback(e => {
+    debugger
     e.persist()
     let { files: [file] } = e.clipboardData
     file && upload(file)
@@ -216,22 +183,46 @@ export default ({ socket }) => {
 
   return (
     <div className='App'>
+      <Header />
       <MessageList {...{ list, setList, showLoading, setShowLoading, setStatus, info, startToast }} />
-      <div className='ipt-demo'>
-        <SendOprtions setKey={setKey} />
-        <SendImage ref={fileIptRef} {...{ setShowLoading, setIsSendAble, isSelectFile, startToast }} />
-        <textarea
-          onPaste={pasteHandler}
-          type='text'
-          id='msg-ipt'
-          placeholder='可在此粘贴图片发送'
-          ref={inputEl}
-          onChange={e => { setMsg(e.target.value) }}
-          onKeyDown={e => handlerSend(e)}
+      <div className='footer'>
+        <div className="input-group">
+          <textarea
+            className='msg-ipt'
+            onChange={e => { setMsg(e.target.value) }}
+            value={msg}
+            onKeyDown={e => handlerSend(e)}
+            onPaste={pasteHandler}
+            placeholder='可在此粘贴图片发送'
+            ref={inputEl}
+            type='text'
+          />
+          <div className="btn-group">
+            <button className='btn-group__item send'
+              onClick={send}
+              disabled={!msg}
+            >发送</button>
+            <button className='btn-group__item other'>
+              其他
+            </button>
+          </div>
+        </div>
+        <SendImage ref={fileIptRef}
+          {...{ setShowLoading, startToast, upload, isSelectFile, setIsSelectFile }}
         />
+        {showOther && (
+          <div className="shadow-box" onClick={() => setShowOther(false)}>
+            <div className='other-options'>
+              <div className="other-options__title">其他操作</div>
+              <ul>
+                <li>
+                  <SendOprtions setKey={setKey} />
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
-      <button onClick={send} className='send'>发送</button>
-      <button className='send' onClick={imgSendHandler} disabled={!isSendAble} ref={sendImgEl} >发送文件</button>
     </div>
   )
 }

@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome", // 使用chrome进行调试,会打开浏览器,操作到断点位置会跳转到断点文件
+      "request": "launch",
+      "name": "Chrome项目调试", // 会直接出现在第二步里提供选择
+      "url": "http://localhost:3000", // 打开的网址,端口和要调试的项目端口一致
+      "webRoot": "${workspaceFolder}/src", // chrome插件带的,指定根目录或者执行文件
+      "skipFiles": [
+        "node_modules"
+      ] // 跳过node_modules文件不进入源码断点
+    },
+    {
+      "type": "node", // 调试js文件,不需要打开浏览器直接进行调试
+      "request": "launch",
+      "name": "node脚本调试",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${file}", // 打开当前的js文件进行调试
+    }
+  ]
+}

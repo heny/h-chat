@@ -1,12 +1,27 @@
 .send-img {
-  width: 300px;
   display: flex;
+  align-items: center;
   &__preview {
     display: block;
     margin-left: auto;
+    margin-right: 5px;
     width: 23px;
     height: 23px;
     border: none;
     object-fit: cover;
+  }
+}
+.send {
+  border: none;
+  padding: 0 10px;
+  height: 30px;
+  border-radius: 20px;
+  outline: none;
+  margin-right: 5px;
+  cursor: pointer;
+  color: #fff;
+  background-color: #01cafc;
+  &:disabled {
+    background-color: #b3eefe;
   }
 }

@@ -25,7 +25,7 @@ export default function (props) {
           {list.length ?
             list.map((item, index) => (
               <li key={index} className='msg-list__item'>
-                <List item={item} />
+                <List item={item} startToast={startToast} />
               </li>
             ))
             : <div className='msg-list__empty'>
