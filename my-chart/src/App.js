@@ -212,7 +212,7 @@ export default ({ socket }) => {
         />
         {showOther && (
           <div className="shadow-box" onClick={() => setShowOther(false)}>
-            <div className='other-options'>
+            <div className='other-options' onClick={e => e.stopPropagation()}>
               <div className="other-options__title">其他操作</div>
               <ul>
                 <li>
