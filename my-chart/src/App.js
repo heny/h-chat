@@ -62,10 +62,7 @@ export default ({ socket }) => {
 
   // 请求数据
   const fetchList = React.useCallback(async _ => {
-    // 判断缓存是否有, 即使有也需要存文件
     startToast('Loading...', 'loading')
-    // setShowLoading(true)
-    // 请求接口, 重新存缓存
     getMessageList().then(res => {
       if (res.length) {
         setShowLoading(false)
@@ -125,6 +122,10 @@ export default ({ socket }) => {
       file && upload(file)
     }
   }, [upload])
+
+  // const catchURL = useCallback(() => {
+  //   window.location.href = location.href
+  // }, [])
 
 
   useEffect(() => {
