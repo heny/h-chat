@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import './sendImage.scss'
+import { useMappedState } from 'redux-react-hook'
 import Viewer from 'viewerjs'
 import compressionImg from './compress'
 
@@ -9,6 +10,10 @@ export default React.forwardRef(({ setShowLoading, setIsSelectFile, isSelectFile
   const [isSendAble, setIsSendAble] = useState(false) // 是否可以发送
   const viewer = useRef(null)
   const inputFileEl = useRef(null)
+  const mapState = useCallback(state => ({
+    isCompressImg: state.oprationBtn.isCompressImg
+  }), [])
+  const { isCompressImg } = useMappedState(mapState)
 
   React.useImperativeHandle(ref, state => ({
     setIsSelectFile
@@ -68,7 +73,7 @@ export default React.forwardRef(({ setShowLoading, setIsSelectFile, isSelectFile
     // 如果是图片, 则将图片转换为base64进行预览
     if (file.type.includes('image')) {
       // 判断图片是否过大, 太大进行压缩
-      if (file.size > 1024 * 1024) {
+      if (file.size > 1024 * 1024 && isCompressImg) {
         setIsSelectFile(false)
         setShowLoading(true)
         startToast('图片过大, 正在转换中...')

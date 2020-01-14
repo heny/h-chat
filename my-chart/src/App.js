@@ -18,10 +18,11 @@ export default ({ socket }) => {
   const [isUploadServer] = useState(true) // 是否保存到数据库
   const [key, setKey] = useState('enter')
   const [showOther, setShowOther] = useState(false) // 显示 更多按钮
+  const [isSelectFile, setIsSelectFile] = useState(true) // 是否可以选择文件
   const fileIptRef = createRef(null) // 获取子组件方法
   const inputEl = useRef(null) // 绑定输入框el
   const timerId = useRef(null)
-  const [isSelectFile, setIsSelectFile] = useState(true) // 是否可以选择文件
+
 
   const mapState = useCallback(state => ({
     info: state.toast.info,

@@ -1,11 +1,13 @@
-.send-options {
-  display:flex;
-  align-items: center;
+.opration-btn-group {
   margin-left: 5px;
-  &__item {
+  li {
+    display:flex;
+    align-items: center;
+  }
+  .item {
     margin: 3px 5px 0;
   }
-  &__span {
+  .span {
     padding: 5px 0;
   }
   input:checked + label {
@@ -29,5 +31,9 @@
       position: relative;
       top: -5px;
     }
+  }
+  .specify {
+    font-size: 12px;
+    color: #6a6565;
   }
 }

@@ -20,3 +20,8 @@ export const setStatus = status => dispatch => {
     status
   })
 }
+// 设置压缩图片
+export const setCompress = flag => ({
+  type: types.SET_COMPREFF_IMG,
+  flag
+})
