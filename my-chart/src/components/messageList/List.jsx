@@ -61,13 +61,18 @@ export default ({ item, startToast, ...rest }) => {
       <>
         <span dangerouslySetInnerHTML={{ __html: fileName }}></span>
         <a download href={filePath} className='msg-list__down'>下载</a>
+        {fileName.includes('.html') && <a href={filePath} className='msg-list__down'>查看</a> }
       </>
     )
-  } else if (item.message) {
+  } else if (message) {
     el = (
       <>
         <span>{message}</span>
-        <span className='msg-list__copy' data-clipboard-text={message}>复制</span>
+        {
+          message.startsWith('http')
+          ? <a className='msg-list__down' href={message}>前往</a>
+          : <span className='msg-list__copy' data-clipboard-text={message}>复制</span>
+        }
       </>
     )
   }
