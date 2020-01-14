@@ -86,3 +86,18 @@ body {
     }
   }
 }
+
+@media screen and (min-width: 768px) {
+  .msg-list {
+    width: 50%;
+    display: inline-block;
+    height: calc(100vh - 44px);
+    border-radius: 0;
+    border-right: 1px solid #e5e4e4;
+  }
+  .footer {
+    display: inline-block;
+    width: 50%;
+    vertical-align: top;
+  }
+}

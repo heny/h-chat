@@ -10679,6 +10679,11 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
+viewerjs@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.npm.taobao.org/viewerjs/download/viewerjs-1.5.0.tgz#debea9492189fa41223cc567de915d79435899d0"
+  integrity sha1-3r6pSSGJ+kEiPMVn3pFdeUNYmdA=
+
 vm-browserify@^1.0.1:
   version "1.1.2"
   resolved "https://registry.npm.taobao.org/vm-browserify/download/vm-browserify-1.1.2.tgz?cache=0&sync_timestamp=1572870776965&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fvm-browserify%2Fdownload%2Fvm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"

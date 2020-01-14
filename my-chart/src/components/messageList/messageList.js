@@ -1,14 +1,25 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { useMappedState } from 'redux-react-hook'
 import List from './List'
 import './messageList.scss'
+import Viewer from 'viewerjs'
 import { CSSTransition } from 'react-transition-group'
 import { clearMessage, clearFile } from '../../api/message'
 
 export default function (props) {
+  const viewer = useRef(null)
   const mapState = useCallback(state => ({ status: state.toast.status }), [])
   const { status } = useMappedState(mapState)
   let { list, setList, showLoading, info, startToast } = props
+
+  useEffect(() => {
+    // 挂载图片进行预览
+    let mountEl = document.querySelector('.images')
+    viewer.current = new Viewer(mountEl)
+    return () => {
+      viewer.current.destroy()
+    }
+  }, [list])
 
   const clearAll = useCallback(_ => {
     clearMessage() // 清空数据库
@@ -21,7 +32,7 @@ export default function (props) {
   return (
     <div className='msg-list'>
       <div className='msg-list__scroll'>
-        <ul>
+        <ul className='images'>
           {list.length ?
             list.map((item, index) => (
               <li key={index} className='msg-list__item'>

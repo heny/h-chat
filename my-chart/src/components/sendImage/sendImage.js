@@ -1,17 +1,28 @@
-import React, { useState, useRef, useCallback } from 'react'
+import React, { useState, useRef, useCallback, useEffect } from 'react'
 import './sendImage.scss'
+import Viewer from 'viewerjs'
 import compressionImg from './compress'
 
 export default React.forwardRef(({ setShowLoading, setIsSelectFile, isSelectFile, startToast, upload }, ref) => {
   const [imgUrl, setImgUrl] = useState('')
   const [file, setFile] = useState(null)
   const [isSendAble, setIsSendAble] = useState(false) // 是否可以发送
-
+  const viewer = useRef(null)
   const inputFileEl = useRef(null)
 
   React.useImperativeHandle(ref, state => ({
     setIsSelectFile
   }), [setIsSelectFile])
+
+  useEffect(() => {
+    viewer.current = new Viewer(document.querySelector('.send-img__preview'), {
+      navbar: false // 一张图片不需要显示导航栏
+    })
+    return () => {
+      // 组件卸载关闭
+      viewer.current.destroy()
+    }
+  }, [])
 
   // 设置当前的文件
   const setCurFile = useCallback(file => {
@@ -28,7 +39,6 @@ export default React.forwardRef(({ setShowLoading, setIsSelectFile, isSelectFile
 
   // 发送图片
   const imgSendHandler = useCallback(_ => {
-    // const { file, inputFileEl, setFile, setImgUrl, setIsSendAble } = fileIptRef.current
     // 如果文件超过1m, 则提示
     if (file.size > 1024 * 1024) {
       // setShowLoading(true) // 设置showLoading
@@ -78,6 +88,7 @@ export default React.forwardRef(({ setShowLoading, setIsSelectFile, isSelectFile
       <img className='send-img__preview' src={imgUrl} style={{
         border: imgUrl ? '1px solid #e0dada' : 'none'
       }} alt='' />
+
       <button className='send'
         disabled={!isSendAble}
         onClick={imgSendHandler}

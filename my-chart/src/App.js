@@ -91,7 +91,8 @@ export default ({ socket }) => {
     let formData = new FormData()
     formData.append('file', file)
     let res = await uploadFile(formData)
-    if (file.size > 1024 * 1024) {
+    // 超过500kb就存入数据
+    if (file.size > 500 * 1024) {
       startToast('上传成功,正在推送消息...')
       // setShowLoading(true)
       // setInfo('上传成功,正在推送消息...')
