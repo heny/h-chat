@@ -27,12 +27,12 @@ export default function (props) {
       </li>
       <li>
         <span className="span">是否压缩图片：</span>
-        <input type="radio" onChange={() => dispatch(setCompress(true))} defaultChecked hidden name='compress-img' id='yes' />
+        <input type="radio" onChange={() => dispatch(setCompress(true))} defaultChecked={isCompressImg} hidden name='compress-img' id='yes' />
         <label htmlFor="yes">
           <span>是</span>
         </label>
-        <input type="radio" onChange={() => dispatch(setCompress(false))} hidden name='compress-img' id='no' />
-        <label htmlFor="no">
+        <input type="radio" onChange={() => dispatch(setCompress(false))} defaultChecked={!isCompressImg} hidden name='compress-img' id='no' />
+        <label htmlFor="no" style={{ marginRight: '30px' }}>
           <span>否</span>
         </label>
         <CSSTransition
@@ -43,7 +43,7 @@ export default function (props) {
           in={!isCompressImg}
         >
           <div>
-            <span className='specify'>如果图片不压缩上传将很慢</span>
+            <span className='specify'>图片不压缩上传将很慢</span>
           </div>
         </CSSTransition>
       </li>

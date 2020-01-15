@@ -20,7 +20,7 @@ export default ({ item, startToast, ...rest }) => {
   let { message, fileName, filePath } = item
   if (fileName && fileName.match(/png|jpg|gif|jpeg/)) {
     el = (
-      <img className='msg-list__img' src={message} alt="" />
+      <img className='msg-list__img' src={message || filePath} alt="" />
     )
   } else if (fileName) {
     el = (
