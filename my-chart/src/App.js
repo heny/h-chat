@@ -5,12 +5,13 @@ import MessageList from './components/messageList/messageList'
 import SendImage from './components/sendImage/sendImage'
 import Header from './components/header/header'
 import './App.scss'
-import { getMessageList, addMessage, uploadFile } from './api/message'
+import { getMessageList, addMessage } from './api/message'
 import {
   setShowLoading as setshowloading,
   setInfo as setinfo,
   setStatus as setstatus
 } from './store/actions'
+import uploadFiles from './utils/upload'
 
 export default ({ socket }) => {
   const [msg, setMsg] = useState('')
@@ -89,30 +90,8 @@ export default ({ socket }) => {
 
   // 处理文件上传
   const upload = useCallback(async file => {
-    let formData = new FormData()
-    formData.append('file', file)
-    let res = await uploadFile(formData)
-    // 超过500kb就存入数据
-    if (file.size > 500 * 1024) {
-      startToast('上传成功,正在推送消息...')
-      // setShowLoading(true)
-      // setInfo('上传成功,正在推送消息...')
-      timerId.current = setTimeout(() => {
-        setInfo('文件过大, 请耐心等待...')
-        setTimeout(() => {
-          setInfo('加载超时, 正在重新加载页面...')
-          setTimeout(() => {
-            window.location.reload()
-          }, 1500)
-        }, 30000)
-      }, 3000)
-    }
-    if (res) {
-      setIsSelectFile(false)
-      socket.emit('message', res)
-    }
-  }, [socket, startToast, setInfo, setIsSelectFile])
-
+    uploadFiles(file, startToast,setIsSelectFile,socket, setInfo)
+  }, [socket, startToast, setIsSelectFile, setInfo])
 
   // 拖拽发送图片
   const dragUpload = useCallback(() => {

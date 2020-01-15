@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+    <input type="file" id='fileEl'>
+    <button onclick='upload()'>上传</button>
+  <script>
+    // let baseURL = 'http://localhost:8008'
+    let baseURL = 'https://chart-server.heny.vip'
+    // 生成切片
+    function createFileChunk(file, chunkSize = 10 * 1024 * 1024){
+      const fileChunkList = []
+      let cur = 0
+      let i = 0
+      while (cur < file.size) {
+        fileChunkList.push({
+          chunk: file.slice(cur, cur + chunkSize), 
+          hash: file.name + '-' + i,
+          index: i,
+          percentage: 0
+        })
+        cur += chunkSize
+        i++
+      }
+      return fileChunkList
+    }
+    async function upload() {
+      let [file] = fileEl.files
+      let fileChunkList = createFileChunk(file)
+      const requestList = fileChunkList
+        .map(({chunk, hash}) => {
+          const formData = new FormData()
+          formData.append('chunk', chunk)
+          formData.append('hash', hash)
+          formData.append('filename', file.name)
+          return {formData}
+        })
+        .map(async ({formData}, index) =>request({
+            url: `${baseURL}/msg/upload`,
+            data: formData,
+            onProgress: createProgressHandler(fileChunkList[index], file, fileChunkList)
+          })
+          )
+      console.log('请求之前')
+      let res = await Promise.all(requestList)
+      console.log(res, '请求之后')
+      await mergeRequest(file.name)
+    }
+
+    // let percent = 0
+    function createProgressHandler(item, file, fileChunkList){
+      return e => {
+        item.percentage = parseInt(String((e.loaded / e.total) * 100));
+        uploadPercentage(file, fileChunkList)
+        // percent += item.percentage
+        // console.log(percent, 'itemitemitem')
+      }
+    }
+
+    function uploadPercentage(file, data) {
+      if(!file || !data.length) return 0
+      const loaded = data
+            .map(item => item.chunk.size * item.percentage)
+            .reduce((acc, cur) => acc + cur);
+      console.log(parseInt((loaded / file.size).toFixed(2)), '333333333')
+    }
+
+    async function mergeRequest(name) {
+      let mergeRef = await request({
+        url: `${baseURL}/msg/merge`,
+        headers: {
+          "content-type": "application/json"
+        },
+        data: JSON.stringify({filename: name})
+      })
+      console.log(mergeRef, '合并完成')
+    }
+
+    function request({
+      url,
+      method = "post",
+      data,
+      headers = {},
+      onProgress = e => e,
+      requestList
+    }) {
+      return new Promise(resolve => {
+        const xhr = new XMLHttpRequest();
+        xhr.upload.onprogress = onProgress;
+        xhr.open(method, url);
+        Object.keys(headers).forEach(key =>
+          xhr.setRequestHeader(key, headers[key])
+        );
+        xhr.send(data);
+        xhr.onload = e => {
+          resolve({
+            data: e.target.response
+          });
+        };
+      });
+    }
+  </script>
+</body>
+</html>
