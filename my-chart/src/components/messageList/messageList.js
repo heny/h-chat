@@ -29,6 +29,12 @@ export default function (props) {
     // localStorage.removeItem('list') // 删除localStorage
   }, [setList, startToast])
 
+  let toastEl = {
+    loading: <i className='icon-Loading iconfont my-loading'></i>,
+    success: <i style={{ fontSize: '25px' }} className='iconfont icon-success'></i>,
+    warning: <i style={{ fontSize: '18px' }} className='iconfont icon-warning'></i>
+  }
+
   return (
     <div className='msg-list'>
       <div className='msg-list__scroll'>
@@ -54,9 +60,7 @@ export default function (props) {
         >
           <div>
             <div className='toast'>
-              {/* {status === 'loading' && <span className='dot'></span>} */}
-              {status === 'loading' && <i className='icon-Loading iconfont my-loading'></i>}
-              {status === 'success' && <i style={{ fontSize: '25px' }} className='iconfont icon-success'></i>}
+              {toastEl[status]}
               {info}
             </div>
           </div>

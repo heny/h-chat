@@ -40,7 +40,7 @@ const mergeFileChunk = (filePath) => {
   return new Promise(resolve => {
     // 打包的目录带pack
     let packFilename = `${filePath}_pack`
-    if(fs.existsSync(packFilename)){
+    if (fs.existsSync(packFilename)) {
       const chunkPaths = fs.readdirSync(packFilename)
       fs.writeFileSync(filePath, '')
       // 循环添加数据
@@ -59,14 +59,24 @@ const mergeFileChunk = (filePath) => {
   })
 }
 
+router.post('/verify', (req, res) => {
+  let { filename } = req.body
+  if (fs.existsSync(`${UPLOAD_DIR}/${filename}`)) {
+    res.send({ shouldIgnore: false })
+  } else {
+    res.send({ shouldIgnore: true })
+  }
+  console.log(filename, 'filename')
+})
+
 // 合并请求
 router.post('/merge', async (req, res) => {
-  let {filename} = req.body
+  let { filename } = req.body
   let url = req.headers.host
   let extname = path.extname(filename) // 扩展后缀
   const filePath = `${UPLOAD_DIR}/${filename}`
   let fileSize = await mergeFileChunk(filePath)
-  if(!fileSize){
+  if (!fileSize) {
     res.send(response.fail('合并失败'))
     return
   }
@@ -97,8 +107,8 @@ router.post('/upload', (req, res) => {
   console.log('请求上传成功')
 
   // 防止文件夹不存在, 执行下创建
-  if(!fs.existsSync(UPLOAD_DIR)){
-    fs.mkdirSync(UPLOAD_DIR, {recursive: true})
+  if (!fs.existsSync(UPLOAD_DIR)) {
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true })
   }
   let form = new formidable.IncomingForm()
   form.uploadDir = UPLOAD_DIR // 上传文件地址
@@ -110,7 +120,7 @@ router.post('/upload', (req, res) => {
     }
 
     let uploadPath = files.chunk // 文件
-    if(!uploadPath) {
+    if (!uploadPath) {
       res.send(response.fail('没有读取到文件, 请重新调试'))
       return
     }
@@ -119,7 +129,7 @@ router.post('/upload', (req, res) => {
     let filename = fields.filename
     let packFilename = filename + '_pack'
     // 判断目录是否存在, 因为切片要重复往里面放入文件
-    if(!fs.existsSync(`${UPLOAD_DIR}/${packFilename}`)){
+    if (!fs.existsSync(`${UPLOAD_DIR}/${packFilename}`)) {
       fs.mkdirSync(`${UPLOAD_DIR}/${packFilename}`)
     }
 
@@ -127,7 +137,7 @@ router.post('/upload', (req, res) => {
 
     // 修改名字
     fs.rename(uploadPath.path, filePath, err => {
-      if(err) return res.send(response.fail(`修改失败：${err}`))
+      if (err) return res.send(response.fail(`修改失败：${err}`))
       console.log('文件修改成功')
       res.send(response.success('上传成功'))
     })

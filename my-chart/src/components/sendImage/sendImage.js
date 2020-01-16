@@ -4,7 +4,7 @@ import { useMappedState } from 'redux-react-hook'
 import Viewer from 'viewerjs'
 import compressionImg from './compress'
 
-export default React.forwardRef(({ setShowLoading, setIsSelectFile, isSelectFile, startToast, upload }, ref) => {
+export default React.forwardRef(({ setShowToast, setIsSelectFile, isSelectFile, startToast, upload }, ref) => {
   const [imgUrl, setImgUrl] = useState('')
   const [file, setFile] = useState(null)
   const [isSendAble, setIsSendAble] = useState(false) // 是否可以发送
@@ -35,19 +35,19 @@ export default React.forwardRef(({ setShowLoading, setIsSelectFile, isSelectFile
     setFile(file)
     fr.readAsDataURL(file)
     fr.onload = () => {
-      setShowLoading(false)
+      setShowToast(false)
       setImgUrl(fr.result)
       setIsSendAble(true)
       setIsSelectFile(true)
     }
-  }, [setFile, setIsSendAble, setShowLoading, setIsSelectFile])
+  }, [setFile, setIsSendAble, setShowToast, setIsSelectFile])
 
   // 发送图片
   const imgSendHandler = useCallback(_ => {
     // 如果文件超过1m, 则提示
     if (file.size > 1024 * 1024) {
-      // setShowLoading(true) // 设置showLoading
-      startToast('正在上传中, 请等待...')
+      // setShowToast(true) // 设置showLoading
+      startToast('开始上传, 请等待...')
     }
     inputFileEl.current.value = '' // 清空文件选择框
     setFile(null) // 清空文件
@@ -56,11 +56,12 @@ export default React.forwardRef(({ setShowLoading, setIsSelectFile, isSelectFile
     setImgUrl('') // 清空图片信息
 
     // 处理图片发送
-    if (!file) return
-    // 处理文件上传
-    upload(file)
-
-  }, [inputFileEl, upload, startToast, setFile, setIsSelectFile, setIsSendAble, setImgUrl, file])
+    if (file) {
+      upload(file)
+    } else {
+      setShowToast(false)
+    }
+  }, [inputFileEl, upload, startToast, setFile, setIsSelectFile, setIsSendAble, setImgUrl, file, setShowToast])
 
   // 选择文件上传
   const changeHandler = e => {
@@ -72,12 +73,15 @@ export default React.forwardRef(({ setShowLoading, setIsSelectFile, isSelectFile
     if (!file) return // 如果没有file则不往下执行
     // 如果是图片, 则将图片转换为base64进行预览
     if (file.type.includes('image')) {
-      // 判断图片是否过大, 太大进行压缩
-      if (file.size > 1024 * 1024 && isCompressImg) {
+      // 判断图片是否过大, 进行toast提示, 太大进行压缩
+      if (file.size > 1024 * 1024) {
         setIsSelectFile(false)
-        setShowLoading(true)
         startToast('图片过大, 正在转换中...')
-        compressionImg(file, newFile => setCurFile(newFile))
+        if (isCompressImg) {
+          compressionImg(file, newFile => setCurFile(newFile))
+        } else {
+          setCurFile(file)
+        }
       } else {
         setCurFile(file)
       }

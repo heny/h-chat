@@ -7,7 +7,7 @@ import Header from './components/header/header'
 import './App.scss'
 import { getMessageList, addMessage } from './api/message'
 import {
-  setShowLoading as setshowloading,
+  setShowToast as setshowToast,
   setInfo as setinfo,
   setStatus as setstatus
 } from './store/actions'
@@ -24,15 +24,14 @@ export default ({ socket }) => {
   const inputEl = useRef(null) // 绑定输入框el
   const timerId = useRef(null)
 
-
   const mapState = useCallback(state => ({
     info: state.toast.info,
     showLoading: state.toast.showLoading
   }), [])
   const { showLoading, info } = useMappedState(mapState)
   const dispatch = useDispatch()
-  const setShowLoading = useCallback((flag) => {
-    setshowloading(flag)(dispatch)
+  const setShowToast = useCallback((flag) => {
+    setshowToast(flag)(dispatch)
   }, [dispatch])
   const setInfo = useCallback(message => {
     setinfo(message)(dispatch)
@@ -42,15 +41,15 @@ export default ({ socket }) => {
   }, [dispatch])
 
   const startToast = useCallback((info, status = 'loading', isPermanent = true, time = 1500) => {
-    setShowLoading(true)
+    setShowToast(true)
     setInfo(info)
     setStatus(status)
     if (!isPermanent) {
       setTimeout(() => {
-        setShowLoading(false)
+        setShowToast(false)
       }, time)
     }
-  }, [setInfo, setStatus, setShowLoading])
+  }, [setInfo, setStatus, setShowToast])
 
   // 发送消息函数
   const sendMessage = useCallback((message, size) => {
@@ -67,18 +66,18 @@ export default ({ socket }) => {
     startToast('Loading...', 'loading')
     getMessageList().then(res => {
       if (res.length) {
-        setShowLoading(false)
+        setShowToast(false)
       } else {
         setTimeout(() => {
-          setShowLoading(false)
+          setShowToast(false)
         }, 1500)
       }
       // 将请求到的数据放进list里面
       setList(res)
     }).catch(() => {
-      setShowLoading(false)
+      setShowToast(false)
     })
-  }, [setShowLoading, startToast])
+  }, [setShowToast, startToast])
 
   // enter发送消息
   const send = useCallback(async _ => {
@@ -90,7 +89,7 @@ export default ({ socket }) => {
 
   // 处理文件上传
   const upload = useCallback(async file => {
-    uploadFiles(file, startToast,setIsSelectFile,socket, setInfo)
+    uploadFiles(file, startToast, setIsSelectFile, socket, setInfo)
   }, [socket, startToast, setIsSelectFile, setInfo])
 
   // 拖拽发送图片
@@ -116,7 +115,7 @@ export default ({ socket }) => {
     socket.on('jieshou', message => {
       // 判断是否是定时器在执行
       timerId.current && clearTimeout(timerId.current)
-      setShowLoading(false)
+      setShowToast(false)
       setList(state => {
         let state2 = JSON.parse(JSON.stringify(state))
         state2.unshift(message)
@@ -124,7 +123,7 @@ export default ({ socket }) => {
         return state2
       })
     })
-  }, [fetchList, setIsSelectFile, setShowLoading, dragUpload, socket])
+  }, [fetchList, setIsSelectFile, setShowToast, dragUpload, socket])
 
   const handleEnter = useCallback(e => {
     if (e.keyCode === 13) {
@@ -166,7 +165,7 @@ export default ({ socket }) => {
   return (
     <div className='App'>
       <Header />
-      <MessageList {...{ list, setList, showLoading, setShowLoading, setStatus, info, startToast }} />
+      <MessageList {...{ list, setList, showLoading, setShowToast, setStatus, info, startToast }} />
       <div className='footer'>
         <div className="input-group">
           <textarea
@@ -190,7 +189,7 @@ export default ({ socket }) => {
           </div>
         </div>
         <SendImage ref={fileIptRef}
-          {...{ setShowLoading, startToast, upload, isSelectFile, setIsSelectFile }}
+          {...{ setShowToast, startToast, upload, isSelectFile, setIsSelectFile }}
         />
         {showOther && (
           <div className="shadow-box" onClick={() => setShowOther(false)}>
