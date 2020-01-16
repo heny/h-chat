@@ -29,7 +29,7 @@ require('./socket')(io)
 // 开放uploads文件夹提供下载文件
 app.use('/file', express.static('uploads'))
 
-var port = process.env.PORT || 8008
+var port = process.env.PORT || 8888
 server.listen(port, _ => {
   console.log('8888端口监听成功')
 })

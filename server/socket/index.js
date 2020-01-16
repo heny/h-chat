@@ -1,33 +1,44 @@
   
 const format = require('../configue/response')
+
+// 在線用戶
+var onlineUsers = {}
+// 當前用戶人數
+var onlineCount = 0
+var i = 0
+
 module.exports = function (io) {
-  const userAll = new Set()
   // 连接socket.io
   io.on('connection', socket => {
-    socket.emit('access', '有人上线了')
-
+    
+    // 有人上线了
+    socket.broadcast.emit('/access')
+    socket.name = ++i
+    onlineUsers[socket.name] = socket
+    
     // 接收消息
     socket.on('message', msg => {
-      socket.emit('jieshou', msg)
+      io.emit('jieshou', msg)
     })
 
-    socket.on('disconnection', () => {
-      socket.emit('/leave', '有人离开了')
+    // 有人离开了
+    socket.on('disconnect', () => {
+      socket.broadcast.emit('/leave')
+      delete onlineUsers[socket.name]
     })
 
-    // 获取当前用户列表
-    // socket.on('/user/list', callback => {
-    //   callback(format.success())
-    // })
+    // 修改昵称
+    socket.on('/user/modify', nickName => {
+      // 谁触发的这个事件, socket就代表谁
+      delete onlineUsers[socket.name]
+      socket.name = nickName
+      onlineUsers[nickName] = socket
+      socket.emit(`修改昵称为：${msg}`, socket)
+    })
 
-    // // 登录
-    // 用户端传入多个数据直接放后面添加，不需要括号，后端接收需要括号
-    // 前端传入：socket.emit('/user/singIn', 'hny', res => {})
-
-    // socket.on('/user/singIn', (user, callback) => {
-    //   userAll.add(user)
-    //   callback(format.success([...userAll], '登录成功'))
-    //   console.log('新用户', user, userAll)
-    // })
+    // 获取当前人数
+    socket.on('/user/list', callback => {
+      callback(Object.keys(onlineUsers).length)
+    })
   })
 }

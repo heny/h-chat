@@ -20,6 +20,7 @@ export default ({ socket }) => {
   const [key, setKey] = useState('enter')
   const [showOther, setShowOther] = useState(false) // 显示 更多按钮
   const [isSelectFile, setIsSelectFile] = useState(true) // 是否可以选择文件
+  const [online, setOnline] = useState(0)
   const fileIptRef = createRef(null) // 获取子组件方法
   const inputEl = useRef(null) // 绑定输入框el
   const timerId = useRef(null)
@@ -103,14 +104,22 @@ export default ({ socket }) => {
     }
   }, [upload])
 
+  // 给url加缓存
   // const catchURL = useCallback(() => {
   //   window.location.href = location.href
   // }, [])
-
+  
+  // 设置当前人数
+  const getCurOnline = useCallback(() => {
+    socket.emit('/user/list', len => {
+      setOnline(len)
+    })
+  }, [socket])
 
   useEffect(() => {
     dragUpload()
     fetchList()
+    getCurOnline()
     // 创建接收事件
     socket.on('jieshou', message => {
       // 判断是否是定时器在执行
@@ -123,7 +132,19 @@ export default ({ socket }) => {
         return state2
       })
     })
-  }, [fetchList, setIsSelectFile, setShowToast, dragUpload, socket])
+
+    socket.on('/access', () => {
+      getCurOnline()
+      startToast('有人上线了', 'success', false)
+    })
+
+    socket.on('/leave', () => {
+      getCurOnline()
+      startToast('有人离开了', 'success', false)
+    })
+
+
+  }, [fetchList, setIsSelectFile, setShowToast, dragUpload, socket, startToast, getCurOnline])
 
   const handleEnter = useCallback(e => {
     if (e.keyCode === 13) {
@@ -164,7 +185,7 @@ export default ({ socket }) => {
 
   return (
     <div className='App'>
-      <Header />
+      <Header online={online} />
       <MessageList {...{ list, setList, showLoading, setShowToast, setStatus, info, startToast }} />
       <div className='footer'>
         <div className="input-group">
