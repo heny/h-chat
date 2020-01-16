@@ -1,8 +1,6 @@
 require('./mongo/connect')
 const express = require('express')
 const app = express()
-const server = require('http').createServer(app);
-const io = require('socket.io')(server)
 const debug = require('debug')('my-application')
 
 app.use('/', (req, res, next) => {
@@ -19,18 +17,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 const msgRoutes = require('./routes/messageRouter')
 app.use('/msg', msgRoutes)
-io.on('connection', socket => {
-  socket.on('message', msg => {
-    io.emit('jieshou', msg)
-  })
-})
+
+// 创建连接socket.io
+const server = require('http').createServer(app);
+const io = require('socket.io')(server)
+io.use(function (socket, next) {
+  return next();
+});
+require('./socket')(io)
 
 // 开放uploads文件夹提供下载文件
 app.use('/file', express.static('uploads'))
 
-var port = process.env.PORT || 8888
+var port = process.env.PORT || 8008
 server.listen(port, _ => {
-  debug('8888端口监听成功')
+  console.log('8888端口监听成功')
 })
 
 app.get('/', (req, res) => {

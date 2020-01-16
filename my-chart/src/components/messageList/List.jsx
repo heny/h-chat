@@ -35,10 +35,9 @@ export default ({ item, startToast, ...rest }) => {
       <>
         <span>{message}</span>
         {
-          message.startsWith('http')
-            ? <a className='msg-list__down' href={message}>前往</a>
-            : <span className='msg-list__copy' data-clipboard-text={message}>复制</span>
+          message.startsWith('http') && <a className='msg-list__down' href={message}>前往</a> 
         }
+        <span className='msg-list__copy' data-clipboard-text={message}>复制</span>
       </>
     )
   }
