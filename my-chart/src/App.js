@@ -27,9 +27,10 @@ export default ({ socket }) => {
 
   const mapState = useCallback(state => ({
     info: state.toast.info,
-    showLoading: state.toast.showLoading
+    showLoading: state.toast.showLoading,
+    isNoticeOnline: state.oprationBtn.isNoticeOnline
   }), [])
-  const { showLoading, info } = useMappedState(mapState)
+  const { showLoading, info, isNoticeOnline } = useMappedState(mapState)
   const dispatch = useDispatch()
   const setShowToast = useCallback((flag) => {
     setshowToast(flag)(dispatch)
@@ -134,18 +135,21 @@ export default ({ socket }) => {
     })
 
     socket.on('/access', () => {
+      // console.log(isNoticeOnline, 'isNoticeOnline')
       getCurOnline()
       startToast('有人上线了', 'success', false)
+      // isNoticeOnline && startToast('有人上线了', 'success', false)
     })
 
     socket.on('/leave', () => {
+      // console.log(isNoticeOnline, 'isNoticeOnline')
       getCurOnline()
       startToast('有人离开了', 'success', false)
+      // isNoticeOnline && startToast('有人离开了', 'success', false)
     })
+  }, [fetchList, setIsSelectFile, setShowToast, dragUpload, socket, startToast, getCurOnline, isNoticeOnline]) 
 
-
-  }, [fetchList, setIsSelectFile, setShowToast, dragUpload, socket, startToast, getCurOnline])
-
+  // ctrl+enter事件
   const handleEnter = useCallback(e => {
     if (e.keyCode === 13) {
       send()
@@ -153,8 +157,23 @@ export default ({ socket }) => {
     }
   }, [send])
 
+  // alt+s 发送消息
+  const handleEnterAlt = useCallback(e => {
+    if(e.keyCode === 83) {
+      send()
+      inputEl.current.value = ''
+    }
+  }, [send])
+
   // 判断发送事件
   const handlerSend = useCallback(e => {
+    // alt+s 事件
+    if(e.altKey){
+      inputEl.current.addEventListener('keydown', handleEnterAlt)
+      inputEl.current.addEventListener('keyup', e => {
+        inputEl.current.removeEventListener('keydown', handleEnterAlt)
+      })
+    }
     if (key === 'enter') {
       if (e.keyCode === 13) {
         // 阻止默认的回车按钮
@@ -173,11 +192,10 @@ export default ({ socket }) => {
         })
       }
     }
-  }, [handleEnter, key, send])
+  }, [handleEnter, handleEnterAlt, key, send])
 
   // 粘贴发送消息
   const pasteHandler = useCallback(e => {
-    debugger
     e.persist()
     let { files: [file] } = e.clipboardData
     file && upload(file)
@@ -218,7 +236,7 @@ export default ({ socket }) => {
               <div className="other-options__title">其他操作</div>
               <ul>
                 <li>
-                  <SendOprtions setKey={setKey} />
+                  <SendOprtions setKey={setKey} myKey={key} />
                 </li>
               </ul>
             </div>

@@ -1,26 +1,27 @@
 import React, { useCallback } from 'react'
 import { useDispatch, useMappedState } from 'redux-react-hook'
-import { setCompress } from '../../store/actions'
+import { setCompress, setIsNoticeOnline } from '../../store/actions'
 import { CSSTransition } from 'react-transition-group'
 import './oprationBtn.scss'
 
 export default function (props) {
-  let { setKey } = props
+  let { setKey, myKey } = props
   const dispatch = useDispatch()
   const mapState = useCallback(state => ({
-    isCompressImg: state.oprationBtn.isCompressImg
+    isCompressImg: state.oprationBtn.isCompressImg,
+    isNoticeOnline: state.oprationBtn.isNoticeOnline
   }), [])
-  const { isCompressImg } = useMappedState(mapState)
+  const { isCompressImg, isNoticeOnline } = useMappedState(mapState)
   return (
     <ul className='opration-btn-group'>
       <li className='send-options'>
         <span className='span'>发送消息按键：</span>
-        <input type="radio" hidden name="send-options" onChange={() => setKey('enter')} className='item' defaultChecked id="enter-radio" />
+        <input type="radio" hidden name="send-options" onChange={() => setKey('enter')} className='item' defaultChecked={myKey === 'enter'} id="enter-radio" />
         <label htmlFor="enter-radio">
           <span>enter</span>
         </label>
 
-        <input type="radio" hidden name="send-options" onChange={() => setKey('ctrl-enter')} className='item' id="ctrl_enter-radio" />
+        <input type="radio" hidden name="send-options" onChange={() => setKey('ctrl-enter')} className='item' defaultChecked={myKey === 'ctrl-enter'} id="ctrl_enter-radio" />
         <label htmlFor="ctrl_enter-radio" >
           <span>ctrl+enter</span>
         </label>
@@ -47,6 +48,17 @@ export default function (props) {
           </div>
         </CSSTransition>
       </li>
+      {/* <li>
+        <span className="span">上线是否提示：</span>
+        <input type="radio" onChange={() => dispatch(setIsNoticeOnline(true))} defaultChecked={isNoticeOnline} hidden name='notice-online' id='notice-online-yes' />
+        <label htmlFor="notice-online-yes">
+          <span>是</span>
+        </label>
+        <input type="radio" onChange={() => dispatch(setIsNoticeOnline(false))} defaultChecked={!isNoticeOnline} hidden name='notice-online' id='notice-online-no' />
+        <label htmlFor="notice-online-no" style={{ marginRight: '30px' }}>
+          <span>否</span>
+        </label>
+      </li> */}
     </ul>
   )
 }

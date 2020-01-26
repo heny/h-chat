@@ -137,13 +137,13 @@ export default async (file, startToast, setIsSelectFile, socket) => {
   let fileHash = await calculateHash(fileChunkList)
   store.dispatch(setHash(fileHash))
   // 判断是否秒传
-  const { shouldIgnore } = await verifyUpload(file.name)
-  console.log(shouldIgnore, 'shouldUpload')
-  if (!shouldIgnore) {
-    setIsSelectFile(true)
-    startToast('文件已存在', 'warning', false)
-    return
-  }
+  // const { shouldIgnore } = await verifyUpload(file.name)
+  // console.log(shouldIgnore, 'shouldUpload')
+  // if (!shouldIgnore) {
+  //   setIsSelectFile(true)
+  //   startToast('文件已存在', 'warning', false)
+  //   return
+  // }
   // 给每个文件添加hash值, 并修改原hash值
   fileChunkList = fileChunkList.map(item => ({
     ...item,

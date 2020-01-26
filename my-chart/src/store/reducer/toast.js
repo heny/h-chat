@@ -2,7 +2,7 @@ import * as types from '../types'
 const initialState = {
   showLoading: false,
   info: 'Loading...',
-  status: 'loading'
+  status: 'loading' 
 }
 const reducer = (state = initialState, action) => {
   switch (action.type) {
