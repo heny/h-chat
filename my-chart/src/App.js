@@ -12,6 +12,7 @@ import {
   setStatus as setstatus
 } from './store/actions'
 import uploadFiles from './utils/upload'
+import { to } from './utils'
 
 export default ({ socket }) => {
   const [msg, setMsg] = useState('')
@@ -63,24 +64,6 @@ export default ({ socket }) => {
     }
   }, [isUploadServer, socket])
 
-  // 请求数据
-  const fetchList = React.useCallback(async _ => {
-    startToast('Loading...', 'loading')
-    getMessageList().then(res => {
-      if (res.length) {
-        setShowToast(false)
-      } else {
-        setTimeout(() => {
-          setShowToast(false)
-        }, 1500)
-      }
-      // 将请求到的数据放进list里面
-      setList(res)
-    }).catch(() => {
-      setShowToast(false)
-    })
-  }, [setShowToast, startToast])
-
   // enter发送消息
   const send = useCallback(async _ => {
     if (!msg) return
@@ -94,16 +77,6 @@ export default ({ socket }) => {
     uploadFiles(file, startToast, setIsSelectFile, socket, setInfo)
   }, [socket, startToast, setIsSelectFile, setInfo])
 
-  // 拖拽发送图片
-  const dragUpload = useCallback(() => {
-    // 触发ondrog事件
-    document.ondragover = e => e.preventDefault()
-    document.ondrop = e => e.preventDefault()
-    document.querySelector('.msg-list').ondrop = e => {
-      let { files: [file] } = e.dataTransfer
-      file && upload(file)
-    }
-  }, [upload])
 
   // 给url加缓存
   // const catchURL = useCallback(() => {
@@ -117,9 +90,34 @@ export default ({ socket }) => {
     })
   }, [socket])
 
+  // 拖拽发送图片
   useEffect(() => {
-    dragUpload()
-    fetchList()
+    // 触发ondrog事件
+    document.ondragover = e => e.preventDefault()
+
+    document.ondrop = e => e.preventDefault()
+    document.querySelector('.msg-list').ondrop = e => {
+      let { files: [file] } = e.dataTransfer
+      file && upload(file)
+    }
+  }, [upload])
+
+  useEffect(() => {
+    // 请求数据
+    (async function(){
+      startToast('Loading...', 'loading')
+      let [err, res] = await to(getMessageList())
+      if(err) return startToast('请求出错', 'warning', false)
+      setTimeout(() => {
+        setShowToast(false)
+        // 将请求到的数据放进list里面
+        setList(res)
+        // 如果有数据就直接消失显示框, 如果没有数据则显示1.5s再消失
+      }, res.length ? 0 : 1500)
+    })()
+  }, [setShowToast, startToast])
+
+  useEffect(() => {
     getCurOnline()
     // 创建接收事件
     socket.on('jieshou', message => {
@@ -147,7 +145,7 @@ export default ({ socket }) => {
       startToast('有人离开了', 'success', false)
       // isNoticeOnline && startToast('有人离开了', 'success', false)
     })
-  }, [fetchList, setIsSelectFile, setShowToast, dragUpload, socket, startToast, getCurOnline, isNoticeOnline]) 
+  }, [setIsSelectFile, setShowToast, socket, startToast, getCurOnline, isNoticeOnline]) 
 
   // ctrl+enter事件
   const handleEnter = useCallback(e => {

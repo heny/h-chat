@@ -54,12 +54,8 @@
       await mergeRequest(file.name)
     }
 
-<<<<<<< HEAD
-    function createProgressHandler(item, file, fileChunkList){
-=======
     // let percent = 0
     function createProgressHandler(item, file, fileChunkList) {
->>>>>>> ad139508ebfd915801f615d87b48ab9e74c14609
       return e => {
         item.percentage = parseInt(String((e.loaded / e.total) * 100));
         uploadPercentage(file, fileChunkList)
