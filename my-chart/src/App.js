@@ -103,18 +103,20 @@ export default ({ socket }) => {
   }, [upload])
 
   useEffect(() => {
+    let ignore = false
     // 请求数据
-    (async function(){
+    ;(async function(){
       startToast('Loading...', 'loading')
       let [err, res] = await to(getMessageList())
       if(err) return startToast('请求出错', 'warning', false)
       setTimeout(() => {
         setShowToast(false)
         // 将请求到的数据放进list里面
-        setList(res)
+        if(!ignore) setList(res)
         // 如果有数据就直接消失显示框, 如果没有数据则显示1.5s再消失
       }, res.length ? 0 : 1500)
-    })()
+    })();
+    return () => {ignore = true}
   }, [setShowToast, startToast])
 
   useEffect(() => {
