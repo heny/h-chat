@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { useDispatch, useMappedState } from 'redux-react-hook'
-import { setCompress, setIsNoticeOnline } from '../../store/actions'
+import { setCompress } from '../../store/actions'
 import { CSSTransition } from 'react-transition-group'
 import './oprationBtn.scss'
 
@@ -11,7 +11,7 @@ export default function (props) {
     isCompressImg: state.oprationBtn.isCompressImg,
     isNoticeOnline: state.oprationBtn.isNoticeOnline
   }), [])
-  const { isCompressImg, isNoticeOnline } = useMappedState(mapState)
+  const { isCompressImg } = useMappedState(mapState)
   return (
     <ul className='opration-btn-group'>
       <li className='send-options'>
@@ -48,17 +48,6 @@ export default function (props) {
           </div>
         </CSSTransition>
       </li>
-      {/* <li>
-        <span className="span">上线是否提示：</span>
-        <input type="radio" onChange={() => dispatch(setIsNoticeOnline(true))} defaultChecked={isNoticeOnline} hidden name='notice-online' id='notice-online-yes' />
-        <label htmlFor="notice-online-yes">
-          <span>是</span>
-        </label>
-        <input type="radio" onChange={() => dispatch(setIsNoticeOnline(false))} defaultChecked={!isNoticeOnline} hidden name='notice-online' id='notice-online-no' />
-        <label htmlFor="notice-online-no" style={{ marginRight: '30px' }}>
-          <span>否</span>
-        </label>
-      </li> */}
     </ul>
   )
 }
