@@ -60,7 +60,7 @@ export default ({ socket }) => {
     // 判断是否需要保存数据库, 转换的base64超过100k将无法存入数据库
     if (isUploadServer && (!size || size < 1024 * 100)) {
       console.log(message, 'message')
-      addMessage({ message })
+      addMessage({ message, id:Math.random().toString().substr(3,6) })
     }
   }, [isUploadServer, socket])
 

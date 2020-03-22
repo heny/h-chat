@@ -17,7 +17,7 @@ export const addMessage = data =>
  * @name 清空消息列表
  */
 export const clearMessage = () =>
-  getData('/msg/del', null, 'post')
+  getData('/msg/clear', null, 'post')
 
 /**
  * @name 上传文件
@@ -31,3 +31,10 @@ export const uploadFile = file =>
  */
 export const clearFile = () =>
   getData('/msg/clearFile', null, 'post')
+
+/**
+ * @name 删除单条
+ * @param {Object} data 
+ */
+export const delItem = data =>
+  getData('/msg/del', data, 'post')

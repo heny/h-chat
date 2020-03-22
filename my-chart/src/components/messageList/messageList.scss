@@ -22,21 +22,32 @@
   }
   &__item {
     padding: 10px 5px;
+    line-height: 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 32px;
+    position: relative;
     &:not(:last-child) {
       border-bottom: 1px solid #d9d7d7;
+    }
+    &__delete {
+      cursor: pointer;
+      position: absolute!important;
+      right: 5px;
     }
   }
   .clears {
     width: 20px;
     height: 20px;
-    border: 1px solid #ccc;
+    // border: 1px solid #ccc;
     position: absolute;
     border-radius: 50px;
     text-align: center;
     line-height: 20px;
     color: #ccc;
-    right: 5px;
-    top: 5px;
+    right: -3px;
+    top: 0;
     // font-family: -webkit-pictograph;
     transition: all .3s;
     cursor: pointer;
@@ -178,4 +189,18 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+
+
+// 重置antd-mobile 样式
+.am-modal-input input {
+  padding-left: 12px;
+  &[type="text"]::placeholder {
+    padding-left: 0;
+  }
+}
+
+.am-modal-wrap  .am-modal-button-group-h .am-modal-button {
+  font-size: 16px;
 }
