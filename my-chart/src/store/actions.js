@@ -29,12 +29,6 @@ export const setCompress = flag => ({
   flag
 })
 
-// 设置是否上线提示
-export const setIsNoticeOnline = flag => ({
-  type: types.SET_NOTICE_ONLINE,
-  flag
-})
-
 // 设置hash
 export const setHash = hash => ({
   type: types.SET_HASH,

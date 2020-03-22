@@ -1,44 +1,31 @@
-import React, { useEffect } from 'react'
-import Clipboard from 'clipboard'
-export default ({ item, startToast, ...rest }) => {
-  useEffect(() => {
-    let clipboard = new Clipboard('.msg-list__copy')
-    clipboard.on('success', e => {
-      startToast('复制成功', 'success', false)
-    })
-
-    clipboard.on('error', function (e) {
-      console.error('Action:', e.action);
-      console.error('Trigger:', e.trigger);
-    });
-
-    return function () {
-      clipboard.destroy()
-    }
-  }, [startToast])
+import React from 'react'
+export default ({ item, ...rest }) => {
   let el
-  let { message, fileName, filePath } = item
+  let { message, fileName, filePath, fileSize } = item
   if (fileName && fileName.match(/png|jpg|gif|jpeg/)) {
     el = (
       <img className='msg-list__img' src={message || filePath} alt="" />
     )
   } else if (fileName) {
     el = (
-      <>
-        <span dangerouslySetInnerHTML={{ __html: fileName }}></span>
+      <div>
+        <span>
+          fileName
+          <i class='file-size'>{fileSize}</i>
+        </span>
         <a download href={filePath} className='msg-list__down'>下载</a>
         {fileName.includes('.html') && <a href={filePath} className='msg-list__down'>查看</a>}
-      </>
+      </div>
     )
   } else if (message) {
     el = (
-      <>
+      <div>
         <span>{message}</span>
         {
           message.startsWith('http') && <a className='msg-list__down' href={message}>前往</a> 
         }
         <span className='msg-list__copy' data-clipboard-text={message}>复制</span>
-      </>
+      </div>
     )
   }
   return el

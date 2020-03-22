@@ -97,7 +97,7 @@ function calculateHash(fileChunkList) {
   });
 }
 
-// 文件秒传
+/* // 文件秒传
 async function verifyUpload(filename) {
   const { data } = await request({
     url: `${baseURL}msg/verify`,
@@ -108,7 +108,7 @@ async function verifyUpload(filename) {
   });
   console.log(data, 'datadata')
   return JSON.parse(data);
-}
+} */
 
 // 上传切片
 async function uploadChunks(file, startToast, setIsSelectFile, socket, fileChunkList) {

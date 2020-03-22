@@ -5,6 +5,7 @@ import config from './config'
 import IO from 'socket.io-client'
 import { StoreContext } from 'redux-react-hook'
 import store from './store'
+import 'antd-mobile/dist/antd-mobile.css'
 import 'viewerjs/dist/viewer.css'
 
 const path = config.getCurrentServer()

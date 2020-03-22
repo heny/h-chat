@@ -3,4 +3,3 @@ export const SET_LOADING_STATUS = 'SET_LOADING_STATUS' // 设置toast状态
 export const SET_STATUS = 'SET_STATUS' // 设置状态
 export const SET_COMPREFF_IMG = 'SET_COMPREFF_IMG' // 设置是否压缩图片
 export const SET_HASH = 'SET_HASH' // 设置hash
-export const SET_NOTICE_ONLINE = 'SET_NOTICE_ONLINE' // 设置是否通知多少人在线

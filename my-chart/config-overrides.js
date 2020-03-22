@@ -26,7 +26,7 @@ module.exports = {
       'store': resolve('src/store'),
       'components': resolve('src/components'),
       'api': resolve('src/api'),
-      'utils': resolve('utils')
+      'utils': resolve('src/utils')
     })
   )
 }
