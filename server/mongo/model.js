@@ -3,9 +3,14 @@ let Schemas = new mongoose.Schema({
   message: String,
   fileName: String,
   filePath: String,
+  fileSize: String,
+  id: {
+    type: Number,
+    default: Math.random().toString().substr(3,6) // 用于查找标识
+  },
   date: {
     type: Date,
-    default: Date.now()
+    default: Date.now() // 用于排序
   }
 })
 const models = mongoose.model('msg', Schemas)
@@ -34,6 +39,7 @@ const findMessageAll = (conditions, projection, options, callback) => {
   })
 }
 
+// 清空所有
 const updateMessage = (conditions, data, callback) => {
   models.deleteMany(conditions, data, err => {
     if (err) {
@@ -44,4 +50,15 @@ const updateMessage = (conditions, data, callback) => {
   })
 }
 
-module.exports = { addMessage, findMessageAll, updateMessage }
+// 删除一条
+const delMessage = (conditions, callback) => {
+  models.deleteOne(conditions, err => {
+    if(err) {
+      return callback(err)
+    } else {
+      return callback(null)
+    }
+  })
+}
+
+module.exports = { addMessage, findMessageAll, updateMessage, delMessage }
