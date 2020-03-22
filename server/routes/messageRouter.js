@@ -13,7 +13,7 @@ function resolve(dir) {
 const UPLOAD_DIR = resolve('../uploads')
 
 router.get('/list', (req, res) => {
-  msgdb.findMessageAll({}, { message: 1, fileName: 1, filePath: 1, _id: 0 }, { sort: { date: -1 } }, (err, docs) => {
+  msgdb.findMessageAll({}, { message: 1, fileName: 1, filePath: 1, fileSize: 1, _id: 0, id: 1 }, { sort: { date: -1 } }, (err, docs) => {
     if (err) {
       return res.send({ code: 500, message: '数据查询出错' })
     }
@@ -28,9 +28,33 @@ router.post('/add', (req, res) => {
   })
 })
 
-router.post('/del', (req, res) => {
+/**
+ * @name 清空所有文件
+ */
+router.post('/clear', (req, res) => {
   msgdb.updateMessage({}, err => {
-    res.send('删除成功')
+    if(err) {
+      res.send(response.fail('服务器出错了'))
+    } else {
+      res.send(response.success('删除成功'))
+    }
+  })
+})
+
+/**
+ * @name 清空单个文件
+ */
+router.post('/del', (req,res) => {
+  console.log(req.body, 'bodybodybody')
+  if(req.body.fileName) {
+    fs.unlinkSync(`${UPLOAD_DIR}/${req.body.fileName}`)
+  }
+  msgdb.delMessage(req.body, err => {
+    if(err) {
+      res.send(response.fail('服务器出错了'))
+    } else {
+      res.send(response.success('删除成功'))
+    }
   })
 })
 
@@ -95,10 +119,12 @@ router.post('/merge', async (req, res) => {
     base64 = 'data:' + mineType.lookup(filePath) + ';base64,' + data;
   }
 
+  const id = Math.random().toString().substr(3,6)
+
   // 存储数据库
-  msgdb.addMessage({ message: base64, fileName: `${filename}<i class='file-size'>${fileSize}<i>`, filePath: `http://${url}/file/${filename}` }, err => {
+  msgdb.addMessage({ message: base64, fileName: filename, filePath: `http://${url}/file/${filename}`, id, fileSize }, err => {
     console.log('存储数据库')
-    res.send({ message: base64, fileName: `${filename}<i class='file-size'>${fileSize}<i>`, filePath: `http://${url}/file/${filename}` })
+    res.send({ message: base64, fileName: filename, filePath: `http://${url}/file/${filename}`, id, fileSize })
   })
 })
 
