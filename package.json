@@ -1,7 +1,7 @@
 {
   "name": "h-chat",
   "version": "2.1.0",
-  "description": "h-chat,heny,chat",
+  "description": "h-chat,heny,chat, socket",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "cd my-chat && npm run start",
