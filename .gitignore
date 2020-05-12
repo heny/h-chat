@@ -1,0 +1,4 @@
+./server/node_modules
+./my-chat/node_modules
+./my-chat/dist
+./server/uploads
