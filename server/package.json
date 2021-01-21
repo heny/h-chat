@@ -5,7 +5,7 @@
     "formidable": "^1.2.1",
     "mime-types": "^2.1.25",
     "mongoose": "^5.7.12",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.4.0"
   },
   "scripts": {
     "start": "nodemon ./app.js",
